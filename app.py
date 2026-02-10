@@ -324,10 +324,40 @@ if predict_button:
         st.error(f"❌ An error occurred during prediction: {str(e)}")
         st.error("Please check your inputs and try again.")
 
+
 # Display prediction if available
 if st.session_state.prediction_made:
     prediction = st.session_state.predicted_price
     saved_inputs = st.session_state.prediction_inputs
+    
+    # Get similar products from the dataset
+    def get_product_recommendations(brand, predicted_price, top_n=3):
+        if raw_data is not None:
+            # Filter by brand
+            brand_laptops = raw_data[raw_data['Company'] == brand].copy()
+            
+            if len(brand_laptops) > 0:
+                # Calculate price difference
+                brand_laptops['price_diff'] = abs(brand_laptops['Price_Tsh'] - predicted_price)
+                
+                # Sort by price similarity
+                similar_products = brand_laptops.nsmallest(top_n, 'price_diff')
+                
+                recommendations = []
+                for _, row in similar_products.iterrows():
+                    recommendations.append({
+                        'name': f"{row['Company']} {row['Product']}",
+                        'type': row['TypeName'],
+                        'price': row['Price_Tsh'],
+                        'ram': row['Ram'],
+                        'storage': row['PrimaryStorage'],
+                        'screen': row['Inches'],
+                        'cpu': f"{row['CPU_company']} {row['CPU_model']}",
+                        'os': row['OS']
+                    })
+                
+                return recommendations
+        return []
     
     # Display prediction
     st.markdown(f"""
@@ -338,11 +368,52 @@ if st.session_state.prediction_made:
         </div>
     """, unsafe_allow_html=True)
     
+    # Get product recommendations
+    recommendations = get_product_recommendations(saved_inputs['company'], prediction, top_n=3)
+    
+    # Display recommended products
+    if recommendations:
+        st.markdown("### 🎯 Suggested Products from " + saved_inputs['company'])
+        st.markdown("*Based on your predicted price, here are similar laptops from our dataset:*")
+        
+        for i, product in enumerate(recommendations, 1):
+            with st.container():
+                st.markdown(f"""
+                    <div style="
+                        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+                        padding: 1.5rem;
+                        border-radius: 10px;
+                        margin: 1rem 0;
+                        border-left: 5px solid #667eea;
+                    ">
+                        <h4 style="margin: 0 0 1rem 0; color: #333;">
+                            {i}. {product['name']}
+                        </h4>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                            <div>
+                                <p style="margin: 0.3rem 0;"><b>💰 Price:</b> {product['price']:,.0f} Tsh (≈ ${product['price']/2500:.0f})</p>
+                                <p style="margin: 0.3rem 0;"><b>💻 Type:</b> {product['type']}</p>
+                                <p style="margin: 0.3rem 0;"><b>🖥️ OS:</b> {product['os']}</p>
+                            </div>
+                            <div>
+                                <p style="margin: 0.3rem 0;"><b>🧠 RAM:</b> {product['ram']} GB</p>
+                                <p style="margin: 0.3rem 0;"><b>💾 Storage:</b> {product['storage']} GB</p>
+                                <p style="margin: 0.3rem 0;"><b>📺 Screen:</b> {product['screen']}" | <b>⚙️ CPU:</b> {product['cpu']}</p>
+                            </div>
+                        </div>
+                        <p style="margin: 1rem 0 0 0; color: #666; font-size: 0.9rem;">
+                            <b>Price Difference:</b> {abs(product['price'] - prediction):,.0f} Tsh from your predicted price
+                        </p>
+                    </div>
+                """, unsafe_allow_html=True)
+        
+        st.info("💡 **Note:** These are actual laptops from our dataset with prices closest to your prediction.")
+    
     # Additional information
     st.success("✅ Prediction completed successfully!")
     
     # Show prediction details in expandable section
-    with st.expander("📊 View Prediction Details"):
+    with st.expander("📊 View Your Input Specifications"):
         col_detail1, col_detail2 = st.columns(2)
         
         with col_detail1:
@@ -365,7 +436,7 @@ if st.session_state.prediction_made:
     
     # Price range information
     st.info(f"""
-        ℹ️ **Note:** This prediction is based on {model_name} model with 
+        ℹ️ **Model Info:** This prediction is based on {model_name} model with 
         R² score of {model_data['test_r2_score']:.4f}. Actual prices may vary 
         based on market conditions, promotions, and availability.
     """)
@@ -425,6 +496,6 @@ with st.sidebar:
 st.markdown("---")
 st.markdown("""
     <div style="text-align: center; color: #666;">
-        <p>Laptop Price Prediction System v1.0 | Powered by Group 53 & 54 </p>
+        <p>Laptop Price Prediction System v1.0 | Powered by Machine Learning</p>
     </div>
 """, unsafe_allow_html=True)
