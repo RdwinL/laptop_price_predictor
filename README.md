@@ -243,7 +243,7 @@ This project is open source and available for educational purposes.
 
 ## 👨‍💻 Author
 
-Machine Learning Project - Laptop Price Prediction
+Edwin Laswai 
 
 ## 🙏 Acknowledgments
 
