@@ -425,6 +425,6 @@ with st.sidebar:
 st.markdown("---")
 st.markdown("""
     <div style="text-align: center; color: #666;">
-        <p>Laptop Price Prediction System v1.0 | Powered by Machine Learning</p>
+        <p>Laptop Price Prediction System v1.0 | Powered by Group 53 & 54 </p>
     </div>
 """, unsafe_allow_html=True)
