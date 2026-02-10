@@ -48,6 +48,14 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# Initialize session state for prediction results
+if 'prediction_made' not in st.session_state:
+    st.session_state.prediction_made = False
+if 'predicted_price' not in st.session_state:
+    st.session_state.predicted_price = 0
+if 'prediction_inputs' not in st.session_state:
+    st.session_state.prediction_inputs = {}
+
 # Load the trained model
 @st.cache_resource
 def load_model():
@@ -59,79 +67,219 @@ def load_model():
         st.error("❌ Model file not found! Please ensure 'model.pkl' is in the same directory.")
         st.stop()
 
-# Load model
+# Load the raw dataset for dynamic filtering
+@st.cache_data
+def load_raw_data():
+    try:
+        df = pd.read_csv('laptop_prices.csv')
+        return df
+    except FileNotFoundError:
+        # Fallback to default options if CSV not found
+        return None
+
+# Load model and data
 model_data = load_model()
 model = model_data['model']
 scaler = model_data['scaler']
 label_encoders = model_data['label_encoders']
 feature_names = model_data['feature_names']
 model_name = model_data['model_name']
+raw_data = load_raw_data()
+
+# Create brand-specific mappings from raw data
+@st.cache_data
+def get_brand_mappings():
+    if raw_data is not None:
+        # Brand to OS mapping
+        brand_os = raw_data.groupby('Company')['OS'].apply(lambda x: sorted(x.unique().tolist())).to_dict()
+        
+        # Brand to TypeName mapping
+        brand_type = raw_data.groupby('Company')['TypeName'].apply(lambda x: sorted(x.unique().tolist())).to_dict()
+        
+        # Brand to CPU company mapping
+        brand_cpu = raw_data.groupby('Company')['CPU_company'].apply(lambda x: sorted(x.unique().tolist())).to_dict()
+        
+        # Brand to GPU company mapping
+        brand_gpu = raw_data.groupby('Company')['GPU_company'].apply(lambda x: sorted(x.unique().tolist())).to_dict()
+        
+        return brand_os, brand_type, brand_cpu, brand_gpu
+    else:
+        # Fallback defaults
+        companies = ['Apple', 'HP', 'Acer', 'Asus', 'Dell', 'Lenovo', 'MSI', 'Toshiba', 'Samsung']
+        brand_os = {c: ['Windows 10', 'macOS', 'No OS', 'Linux'] for c in companies}
+        brand_os['Apple'] = ['macOS', 'Mac OS X']
+        brand_type = {c: ['Ultrabook', 'Notebook', 'Gaming', '2 in 1 Convertible'] for c in companies}
+        brand_cpu = {c: ['Intel', 'AMD'] for c in companies}
+        brand_gpu = {c: ['Intel', 'AMD', 'Nvidia'] for c in companies}
+        return brand_os, brand_type, brand_cpu, brand_gpu
+
+brand_os_map, brand_type_map, brand_cpu_map, brand_gpu_map = get_brand_mappings()
+
+# Get all unique companies
+all_companies = sorted(brand_os_map.keys())
 
 # Title and description
 st.title("💻 Laptop Price Prediction System")
 st.markdown(f"""
     <div class="info-box">
         <h4>Welcome to the AI-Powered Laptop Price Predictor!</h4>
-        <p>This application uses a <b>{model_name}</b> model trained on {len(feature_names)} features 
+        <p>This application uses a <b>{model_name}</b> model trained on 13 features 
         to predict laptop prices in Tanzanian Shillings (Tsh).</p>
         <p><b>Model Performance:</b> R² Score = {model_data['test_r2_score']:.4f} | 
         RMSE = {model_data['test_rmse']:,.0f} Tsh</p>
     </div>
 """, unsafe_allow_html=True)
 
-# Create two columns for input
-col1, col2 = st.columns(2)
 
-# Get unique values for categorical features
-companies = ['Apple', 'HP', 'Acer', 'Asus', 'Dell', 'Lenovo', 'MSI', 'Toshiba', 'Samsung', 
-             'Razer', 'Mediacom', 'Microsoft', 'Xiaomi', 'Vero', 'Chuwi', 'Google', 'Fujitsu', 
-             'LG', 'Huawei', 'Other']
+# Create expandable sections for better organization
+with st.expander("📋 **STEP 1: Select Laptop Brand**", expanded=True):
+    company = st.selectbox(
+        "Choose the laptop manufacturer",
+        all_companies,
+        key='company_select',
+        help="Select the brand of laptop you want to price"
+    )
 
-type_names = ['Ultrabook', 'Notebook', 'Gaming', '2 in 1 Convertible', 'Workstation', 'Netbook']
+# Get brand-specific options
+available_os = brand_os_map.get(company, ['Windows 10'])
+available_types = brand_type_map.get(company, ['Notebook'])
+available_cpu = brand_cpu_map.get(company, ['Intel'])
+available_gpu = brand_gpu_map.get(company, ['Intel'])
 
-os_options = ['Windows 10', 'macOS', 'No OS', 'Windows 7', 'Mac OS X', 'Linux', 'Chrome OS', 'Windows 10 S']
+with st.expander("💻 **STEP 2: Configure Laptop Specifications**", expanded=True):
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        type_name = st.selectbox(
+            "Laptop Type",
+            available_types,
+            key='type_select',
+            help=f"Available types for {company}"
+        )
+        
+        os = st.selectbox(
+            "Operating System",
+            available_os,
+            key='os_select',
+            help=f"OS options available for {company}"
+        )
+        
+        ram = st.selectbox(
+            "RAM (GB)",
+            [2, 4, 6, 8, 12, 16, 24, 32, 64],
+            index=3,  # Default to 8GB
+            key='ram_select'
+        )
+        
+        primary_storage = st.selectbox(
+            "Storage (GB)",
+            [32, 64, 128, 256, 512, 1024, 2048],
+            index=3,  # Default to 256GB
+            key='storage_select'
+        )
+    
+    with col2:
+        cpu_company = st.selectbox(
+            "CPU Brand",
+            available_cpu,
+            key='cpu_select',
+            help=f"CPU options for {company}"
+        )
+        
+        gpu_company = st.selectbox(
+            "GPU Brand",
+            available_gpu,
+            key='gpu_select',
+            help=f"GPU options for {company}"
+        )
+        
+        cpu_freq = st.number_input(
+            "CPU Frequency (GHz)",
+            min_value=1.0,
+            max_value=4.0,
+            value=2.5,
+            step=0.1,
+            key='cpu_freq_input'
+        )
+        
+        weight = st.number_input(
+            "Weight (kg)",
+            min_value=0.5,
+            max_value=5.0,
+            value=2.0,
+            step=0.1,
+            key='weight_input'
+        )
 
-cpu_companies = ['Intel', 'AMD', 'Samsung']
+with st.expander("🖥️ **STEP 3: Display & Physical Features**", expanded=True):
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        inches = st.number_input(
+            "Screen Size (inches)",
+            min_value=10.0,
+            max_value=18.0,
+            value=15.6,
+            step=0.1,
+            key='inches_input'
+        )
+        
+        touchscreen = st.radio(
+            "Touchscreen",
+            ["No", "Yes"],
+            horizontal=True,
+            key='touch_select'
+        )
+        
+    with col2:
+        ips_panel = st.radio(
+            "IPS Panel",
+            ["No", "Yes"],
+            horizontal=True,
+            key='ips_select'
+        )
+        
+        retina_display = st.radio(
+            "Retina Display",
+            ["No", "Yes"],
+            horizontal=True,
+            key='retina_select'
+        )
 
-gpu_companies = ['Intel', 'AMD', 'Nvidia']
 
-# Input fields in left column
-with col1:
-    st.subheader("📋 Laptop Specifications")
-    
-    company = st.selectbox("Company/Brand", companies)
-    
-    type_name = st.selectbox("Laptop Type", type_names)
-    
-    inches = st.slider("Screen Size (inches)", 10.0, 18.0, 15.6, 0.1)
-    
-    ram = st.selectbox("RAM (GB)", [2, 4, 6, 8, 12, 16, 24, 32, 64])
-    
-    os = st.selectbox("Operating System", os_options)
-    
-    weight = st.slider("Weight (kg)", 0.5, 5.0, 2.0, 0.1)
+# Prediction button with session state management
+st.markdown("---")
+col_predict, col_reset = st.columns([3, 1])
 
-# Input fields in right column
-with col2:
-    st.subheader("⚙️ Hardware Configuration")
-    
-    touchscreen = st.radio("Touchscreen", ["No", "Yes"])
-    
-    ips_panel = st.radio("IPS Panel", ["No", "Yes"])
-    
-    retina_display = st.radio("Retina Display", ["No", "Yes"])
-    
-    cpu_company = st.selectbox("CPU Brand", cpu_companies)
-    
-    cpu_freq = st.slider("CPU Frequency (GHz)", 1.0, 4.0, 2.5, 0.1)
-    
-    primary_storage = st.selectbox("Storage (GB)", [32, 64, 128, 256, 512, 1024, 2048])
-    
-    gpu_company = st.selectbox("GPU Brand", gpu_companies)
+with col_predict:
+    predict_button = st.button("🔮 Predict Price", use_container_width=True)
 
-# Prediction button
-if st.button("🔮 Predict Price"):
+with col_reset:
+    if st.button("🔄 Reset", use_container_width=True):
+        st.session_state.prediction_made = False
+        st.session_state.predicted_price = 0
+        st.session_state.prediction_inputs = {}
+        st.rerun()
+
+if predict_button:
     try:
+        # Store current inputs in session state
+        current_inputs = {
+            'company': company,
+            'type_name': type_name,
+            'inches': inches,
+            'ram': ram,
+            'os': os,
+            'weight': weight,
+            'touchscreen': touchscreen,
+            'ips_panel': ips_panel,
+            'retina_display': retina_display,
+            'cpu_company': cpu_company,
+            'cpu_freq': cpu_freq,
+            'primary_storage': primary_storage,
+            'gpu_company': gpu_company
+        }
+        
         # Prepare input data
         input_data = pd.DataFrame({
             'Company': [company],
@@ -167,50 +315,60 @@ if st.button("🔮 Predict Price"):
         # Make prediction
         prediction = model.predict(input_scaled)[0]
         
-        # Display prediction
-        st.markdown(f"""
-            <div class="prediction-box">
-                <h2>💰 Predicted Laptop Price</h2>
-                <h1 style="font-size: 3rem; margin: 1rem 0;">{prediction:,.0f} Tsh</h1>
-                <p style="font-size: 1.2rem;">≈ ${prediction/2500:.2f} USD (approximate)</p>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        # Additional information
-        st.success("✅ Prediction completed successfully!")
-        
-        # Show prediction details in expandable section
-        with st.expander("📊 View Prediction Details"):
-            col_detail1, col_detail2 = st.columns(2)
-            
-            with col_detail1:
-                st.write("**Input Features:**")
-                st.write(f"- Brand: {company}")
-                st.write(f"- Type: {type_name}")
-                st.write(f"- Screen: {inches}\"")
-                st.write(f"- RAM: {ram} GB")
-                st.write(f"- Storage: {primary_storage} GB")
-                st.write(f"- Weight: {weight} kg")
-            
-            with col_detail2:
-                st.write("**Configuration:**")
-                st.write(f"- OS: {os}")
-                st.write(f"- CPU: {cpu_company} @ {cpu_freq} GHz")
-                st.write(f"- GPU: {gpu_company}")
-                st.write(f"- Touchscreen: {touchscreen}")
-                st.write(f"- IPS Panel: {ips_panel}")
-                st.write(f"- Retina Display: {retina_display}")
-        
-        # Price range information
-        st.info(f"""
-            ℹ️ **Note:** This prediction is based on {model_name} model with 
-            R² score of {model_data['test_r2_score']:.4f}. Actual prices may vary 
-            based on market conditions, promotions, and availability.
-        """)
+        # Store prediction in session state
+        st.session_state.prediction_made = True
+        st.session_state.predicted_price = prediction
+        st.session_state.prediction_inputs = current_inputs
         
     except Exception as e:
         st.error(f"❌ An error occurred during prediction: {str(e)}")
         st.error("Please check your inputs and try again.")
+
+# Display prediction if available
+if st.session_state.prediction_made:
+    prediction = st.session_state.predicted_price
+    saved_inputs = st.session_state.prediction_inputs
+    
+    # Display prediction
+    st.markdown(f"""
+        <div class="prediction-box">
+            <h2>💰 Predicted Laptop Price</h2>
+            <h1 style="font-size: 3rem; margin: 1rem 0;">{prediction:,.0f} Tsh</h1>
+            <p style="font-size: 1.2rem;">≈ ${prediction/2500:.2f} USD (approximate)</p>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    # Additional information
+    st.success("✅ Prediction completed successfully!")
+    
+    # Show prediction details in expandable section
+    with st.expander("📊 View Prediction Details"):
+        col_detail1, col_detail2 = st.columns(2)
+        
+        with col_detail1:
+            st.write("**Input Features:**")
+            st.write(f"- Brand: {saved_inputs['company']}")
+            st.write(f"- Type: {saved_inputs['type_name']}")
+            st.write(f"- Screen: {saved_inputs['inches']}\"")
+            st.write(f"- RAM: {saved_inputs['ram']} GB")
+            st.write(f"- Storage: {saved_inputs['primary_storage']} GB")
+            st.write(f"- Weight: {saved_inputs['weight']} kg")
+        
+        with col_detail2:
+            st.write("**Configuration:**")
+            st.write(f"- OS: {saved_inputs['os']}")
+            st.write(f"- CPU: {saved_inputs['cpu_company']} @ {saved_inputs['cpu_freq']} GHz")
+            st.write(f"- GPU: {saved_inputs['gpu_company']}")
+            st.write(f"- Touchscreen: {saved_inputs['touchscreen']}")
+            st.write(f"- IPS Panel: {saved_inputs['ips_panel']}")
+            st.write(f"- Retina Display: {saved_inputs['retina_display']}")
+    
+    # Price range information
+    st.info(f"""
+        ℹ️ **Note:** This prediction is based on {model_name} model with 
+        R² score of {model_data['test_r2_score']:.4f}. Actual prices may vary 
+        based on market conditions, promotions, and availability.
+    """)
 
 # Sidebar with additional information
 with st.sidebar:
