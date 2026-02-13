@@ -379,7 +379,7 @@ if mode == "Price Predictor":
                 
             }
             button[kind="secondary"]:hover {
-                background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important;
+                background: #DC0E0E !important;
                 color: white !important;
                 box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4) !important;
             }
