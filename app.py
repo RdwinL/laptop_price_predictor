@@ -360,43 +360,37 @@ if mode == "Price Predictor":
     with col3:
         retina_display = st.radio("Retina Display", ["No", "Yes"], horizontal=True, key='retina_select')
     
-    st.markdown("---")
+     st.markdown("---")
+    
+    # Button styling - place before buttons
+     st.markdown("""
+        <style>
+        /* Primary button - centered text */
+        button[kind="primary"] {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        
+        /* Reset button styling */
+        button[kind="secondary"] {
+            background: white !important;
+            color: #e74c3c !important;
+            border: 2px solid #e74c3c !important;
+        }
+        button[kind="secondary"]:hover {
+            background: #DC0E0E !important;
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4) !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
     
     # Main Action Button - Predict Price
-    col1, col2 = st.columns([6, 2])
+    col1, col2 = st.columns([5, 1])
     with col1:
         predict_button = st.button("Predict Price", use_container_width=True, type="primary", key="main_predict")
     with col2:
-        st.markdown("""
-            <style>
-            /* Red reset button styling */
-            button[kind="secondary"] {
-                background: white !important;
-                color: #e74c3c !important;
-                border: 2px solid #e74c3c !important;
-                min-height: 2.5rem !important;
-                height: 2.5rem !important;
-                
-            }
-            button[kind="secondary"]:hover {
-                background: #DC0E0E !important;
-                color: white !important;
-                box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4) !important;
-            }
-        /* Center align predict button text */
-            button[kind="primary"] {
-                line-height: 1 !important;
-                padding: 0.75rem 1rem !important;
-            }
-            
-            button[kind="primary"] * {
-                vertical-align: middle !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                line-height: 1 !important;
-            }       
-            </style>
-        """, unsafe_allow_html=True)
         if st.button("🔄 Reset", use_container_width=True, type="secondary", key="reset_btn"):
             st.session_state.prediction_made = False
             st.rerun()
