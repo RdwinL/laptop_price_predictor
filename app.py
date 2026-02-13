@@ -1163,8 +1163,7 @@ elif mode == "Model Comparison":
                 creating a tree structure that can capture complex non-linear relationships.
             </div>
             """, unsafe_allow_html=True)
-    
-    st.markdown("---")
+
     
     # Recommendation
     st.markdown("---")
