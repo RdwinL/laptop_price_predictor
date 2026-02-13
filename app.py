@@ -369,16 +369,25 @@ if mode == "Price Predictor":
         predict_button = st.button("🔮 Predict Price", use_container_width=True, type="primary", key="main_predict")
     with col2:
         st.markdown("""
-            <style>
-            /* Red reset button styling */
-            button[kind="secondary"] {
-                background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important;
-                color: white !important;
-            }
-            button[kind="secondary"]:hover {
-                background: linear-gradient(135deg, #c0392b 0%, #a93226 100%) !important;
-                box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4) !important;
-            }
+           <style>
+
+                /* Reset button default white */
+                div[data-testid="stButton"] button[key="reset_btn"] {
+                    background-color: white !important;
+                    color: #c0392b !important;
+                    border: 2px solid #c0392b !important;
+                    font-weight: 600;
+                }
+                
+                /* Hover → red */
+                div[data-testid="stButton"] button[key="reset_btn"]:hover {
+                    background-color: #e74c3c !important;
+                    color: white !important;
+                    border: 2px solid #e74c3c !important;
+                    box-shadow: 0 4px 10px rgba(231, 76, 60, 0.4);
+                }
+
+            </style>
             </style>
         """, unsafe_allow_html=True)
         if st.button("🔄 Reset", use_container_width=True, type="secondary", key="reset_btn"):
