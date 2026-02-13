@@ -396,7 +396,7 @@ if mode == "Price Predictor":
     with col1:
         predict_button = st.button("Predict Price", use_container_width=True, type="primary", key="main_predict")
     with col2:
-        if st.button("🔄 Reset", use_container_width=True, type="secondary", key="reset_btn"):
+        if st.button("⟳ Reset", use_container_width=True, type="secondary", key="reset_btn"):
             st.session_state.prediction_made = False
             st.rerun()
     
@@ -497,7 +497,7 @@ if mode == "Price Predictor":
         
         # Download button
         st.download_button(
-            label="📥 Download Prediction Report",
+            label="➜] Download Prediction Report",
             data=report_text,
             file_name=f"laptop_price_prediction_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.txt",
             mime="text/plain",
