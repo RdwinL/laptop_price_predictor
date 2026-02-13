@@ -2,6 +2,8 @@ import streamlit as st
 import pickle
 import numpy as np
 import pandas as pd
+import plotly.graph_objects as go
+import plotly.express as px
 
 # Page configuration
 st.set_page_config(
@@ -11,29 +13,121 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS
+# Custom CSS with professional styling
 st.markdown("""
     <style>
-    .main {padding: 2rem;}
-    .stButton>button {
-        width: 100%; background-color: #4CAF50; color: white;
-        font-size: 18px; font-weight: bold; padding: 0.75rem;
-        border-radius: 10px; border: none; margin-top: 1rem;
+    /* Global styles */
+    .main {
+        padding: 1rem 2rem;
     }
-    .stButton>button:hover {background-color: #45a049;}
-    .prediction-box {
-        padding: 2rem; border-radius: 10px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white; text-align: center; margin: 2rem 0;
+    
+    /* Typography */
+    h1 {
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 0.5rem;
     }
-    .info-box {
-        padding: 1rem; border-radius: 5px;
-        background-color: #f0f2f6; margin: 1rem 0;
+    
+    h2, h3 {
+        font-weight: 500;
+        color: #2c3e50;
     }
+    
+    /* Cards */
+    .metric-card {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .prediction-card {
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        border-radius: 8px;
+        padding: 2rem;
+        color: white;
+        text-align: center;
+        margin: 2rem 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
     .product-card {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        padding: 1.5rem; border-radius: 10px; margin: 1rem 0;
-        border-left: 5px solid #667eea;
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-left: 4px solid #2c3e50;
+        border-radius: 6px;
+        padding: 1.25rem;
+        margin: 0.75rem 0;
+        transition: all 0.2s ease;
+    }
+    
+    .product-card:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+    
+    /* Section headers */
+    .section-header {
+        background: #f8f9fa;
+        border-left: 4px solid #2c3e50;
+        padding: 0.75rem 1rem;
+        margin: 1.5rem 0 1rem 0;
+        border-radius: 4px;
+    }
+    
+    /* Info boxes */
+    .info-box {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+    
+    /* Buttons */
+    .stButton>button {
+        width: 100%;
+        background-color: #2c3e50;
+        color: white;
+        font-size: 16px;
+        font-weight: 500;
+        padding: 0.65rem;
+        border-radius: 6px;
+        border: none;
+        transition: all 0.2s ease;
+    }
+    
+    .stButton>button:hover {
+        background-color: #1a252f;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    /* Sidebar */
+    .css-1d391kg {
+        background-color: #f8f9fa;
+    }
+    
+    /* Remove extra padding */
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+    
+    /* Stats */
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -87,77 +181,154 @@ def get_brand_mappings():
 brand_os_map, brand_type_map, brand_cpu_map, brand_gpu_map = get_brand_mappings()
 all_companies = sorted(brand_os_map.keys())
 
-# Title
-st.title("💻 Laptop Price Intelligence System")
-st.markdown(f"""
-    <div class="info-box">
-        <h4>AI-Powered Price Predictor & Budget Finder</h4>
-        <p>ML Model: <b>{model_name}</b> | R² Score: {model_data['test_r2_score']:.4f} | 
-        RMSE: {model_data['test_rmse']:,.0f} Tsh</p>
-    </div>
-""", unsafe_allow_html=True)
-
-# Mode selection
-st.markdown("---")
-mode = st.radio(
-    "**Choose Your Mode:**",
-    ["🔮 ML Price Predictor", "💰 Budget Finder"],
-    horizontal=True,
-    help="ML Predictor: Enter specs to predict price | Budget Finder: Enter budget to find laptops"
-)
-st.markdown("---")
-
-# ============================================================================
-# MODE 1: ML PRICE PREDICTOR
-# ============================================================================
-if mode == "🔮 ML Price Predictor":
-    st.subheader("🔮 Machine Learning Price Predictor")
-    st.markdown("*Enter laptop specifications to get an AI-powered price prediction*")
+# Sidebar
+with st.sidebar:
+    st.title("Laptop Price Intelligence")
+    st.markdown("---")
     
-    # STEP 1: Brand
-    with st.expander("📋 **STEP 1: Select Laptop Brand**", expanded=True):
-        company = st.selectbox("Choose the laptop manufacturer", all_companies, key='company_select')
+    # Mode selection in sidebar
+    mode = st.radio(
+        "Analysis Mode",
+        ["Price Predictor", "Budget Finder", "Model Analytics"],
+        help="Select the analysis mode you want to use"
+    )
+    
+    st.markdown("---")
+    
+    # Model information
+    st.subheader("Model Information")
+    st.markdown(f"""
+    **Algorithm:** {model_name}
+    
+    **Performance Metrics:**
+    - R² Score: {model_data['test_r2_score']:.4f}
+    - RMSE: {model_data['test_rmse']:,.0f} Tsh
+    - Features: {len(feature_names)}
+    
+    **Dataset:**
+    - Total Samples: 1,275 laptops
+    - Price Range: 100K - 10M Tsh
+    """)
+    
+    st.markdown("---")
+    
+    # About section
+    with st.expander("About This Tool"):
+        st.markdown("""
+        This application uses machine learning to predict laptop prices 
+        based on specifications and help users find laptops within their budget.
+        
+        **Features:**
+        - ML-based price prediction
+        - Budget-based laptop search
+        - Product recommendations
+        - Model performance analytics
+        """)
 
+# Main content
+st.title("Laptop Price Intelligence System")
+st.markdown("Machine learning-powered laptop price prediction and budget analysis")
+
+# ============================================================================
+# MODE 1: PRICE PREDICTOR
+# ============================================================================
+if mode == "Price Predictor":
+    
+    # Model performance summary
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.markdown(f"""
+        <div class="metric-card">
+            <p class="stat-label">R² Score</p>
+            <p class="stat-value">{model_data['test_r2_score']:.3f}</p>
+        </div>
+        """, unsafe_allow_html=True)
+    with col2:
+        st.markdown(f"""
+        <div class="metric-card">
+            <p class="stat-label">RMSE</p>
+            <p class="stat-value">{model_data['test_rmse']/1000:.0f}K</p>
+        </div>
+        """, unsafe_allow_html=True)
+    with col3:
+        st.markdown(f"""
+        <div class="metric-card">
+            <p class="stat-label">Features</p>
+            <p class="stat-value">{len(feature_names)}</p>
+        </div>
+        """, unsafe_allow_html=True)
+    with col4:
+        st.markdown(f"""
+        <div class="metric-card">
+            <p class="stat-label">Model</p>
+            <p class="stat-value" style="font-size: 1.2rem;">{model_name}</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("<div class='section-header'><h3>Configure Laptop Specifications</h3></div>", unsafe_allow_html=True)
+    
+    # STEP 1: Brand Selection
+    st.markdown("**Brand & Type**")
+    col1, col2 = st.columns(2)
+    with col1:
+        company = st.selectbox("Manufacturer", all_companies, key='company_select')
+    
     # Get brand-specific options
     available_os = brand_os_map.get(company, ['Windows 10'])
     available_types = brand_type_map.get(company, ['Notebook'])
     available_cpu = brand_cpu_map.get(company, ['Intel'])
     available_gpu = brand_gpu_map.get(company, ['Intel'])
-
-    # STEP 2: Specifications
-    with st.expander("💻 **STEP 2: Configure Specifications**", expanded=True):
-        col1, col2 = st.columns(2)
-        with col1:
-            type_name = st.selectbox("Laptop Type", available_types, key='type_select')
-            os = st.selectbox("Operating System", available_os, key='os_select')
-            ram = st.selectbox("RAM (GB)", [2, 4, 6, 8, 12, 16, 24, 32, 64], index=3, key='ram_select')
-            primary_storage = st.selectbox("Storage (GB)", [32, 64, 128, 256, 512, 1024, 2048], index=3, key='storage_select')
-        with col2:
-            cpu_company = st.selectbox("CPU Brand", available_cpu, key='cpu_select')
-            gpu_company = st.selectbox("GPU Brand", available_gpu, key='gpu_select')
-            cpu_freq = st.number_input("CPU Frequency (GHz)", 1.0, 4.0, 2.5, 0.1, key='cpu_freq_input')
-            weight = st.number_input("Weight (kg)", 0.5, 5.0, 2.0, 0.1, key='weight_input')
-
-    # STEP 3: Display Features
-    with st.expander("🖥️ **STEP 3: Display & Physical Features**", expanded=True):
-        col1, col2 = st.columns(2)
-        with col1:
-            inches = st.number_input("Screen Size (inches)", 10.0, 18.0, 15.6, 0.1, key='inches_input')
-            touchscreen = st.radio("Touchscreen", ["No", "Yes"], horizontal=True, key='touch_select')
-        with col2:
-            ips_panel = st.radio("IPS Panel", ["No", "Yes"], horizontal=True, key='ips_select')
-            retina_display = st.radio("Retina Display", ["No", "Yes"], horizontal=True, key='retina_select')
-
-    # Prediction buttons
+    
+    with col2:
+        type_name = st.selectbox("Type", available_types, key='type_select')
+    
     st.markdown("---")
-    col_predict, col_reset = st.columns([3, 1])
-    with col_predict:
-        predict_button = st.button("🔮 Predict Price", use_container_width=True)
-    with col_reset:
-        if st.button("🔄 Reset", use_container_width=True):
+    
+    # STEP 2: Core Specifications
+    st.markdown("**Core Specifications**")
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        ram = st.selectbox("RAM (GB)", [2, 4, 6, 8, 12, 16, 24, 32, 64], index=3, key='ram_select')
+    with col2:
+        primary_storage = st.selectbox("Storage (GB)", [32, 64, 128, 256, 512, 1024, 2048], index=3, key='storage_select')
+    with col3:
+        cpu_company = st.selectbox("CPU Brand", available_cpu, key='cpu_select')
+    with col4:
+        gpu_company = st.selectbox("GPU Brand", available_gpu, key='gpu_select')
+    
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        cpu_freq = st.number_input("CPU Frequency (GHz)", 1.0, 4.0, 2.5, 0.1, key='cpu_freq_input')
+    with col2:
+        weight = st.number_input("Weight (kg)", 0.5, 5.0, 2.0, 0.1, key='weight_input')
+    with col3:
+        inches = st.number_input("Screen Size (inches)", 10.0, 18.0, 15.6, 0.1, key='inches_input')
+    with col4:
+        os = st.selectbox("Operating System", available_os, key='os_select')
+    
+    st.markdown("---")
+    
+    # STEP 3: Display Features
+    st.markdown("**Display Features**")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        touchscreen = st.radio("Touchscreen", ["No", "Yes"], horizontal=True, key='touch_select')
+    with col2:
+        ips_panel = st.radio("IPS Panel", ["No", "Yes"], horizontal=True, key='ips_select')
+    with col3:
+        retina_display = st.radio("Retina Display", ["No", "Yes"], horizontal=True, key='retina_select')
+    
+    st.markdown("---")
+    
+    # Prediction buttons
+    col1, col2, col3 = st.columns([2, 1, 1])
+    with col1:
+        predict_button = st.button("Predict Price", use_container_width=True)
+    with col3:
+        if st.button("Reset", use_container_width=True):
             st.session_state.prediction_made = False
             st.rerun()
-
+    
     if predict_button:
         try:
             current_inputs = {
@@ -193,20 +364,74 @@ if mode == "🔮 ML Price Predictor":
             st.session_state.predicted_price = prediction
             st.session_state.prediction_inputs = current_inputs
         except Exception as e:
-            st.error(f"❌ Error: {str(e)}")
-
+            st.error(f"Error: {str(e)}")
+    
     # Display prediction
     if st.session_state.prediction_made:
         prediction = st.session_state.predicted_price
         saved_inputs = st.session_state.prediction_inputs
         
         st.markdown(f"""
-            <div class="prediction-box">
-                <h2>💰 Predicted Price</h2>
-                <h1 style="font-size: 3rem; margin: 1rem 0;">{prediction:,.0f} Tsh</h1>
-                <p style="font-size: 1.2rem;">≈ ${prediction/2500:.2f} USD</p>
+            <div class="prediction-card">
+                <h2>Predicted Price</h2>
+                <h1 style="font-size: 2.5rem; margin: 1rem 0; font-weight: 600;">{prediction:,.0f} Tsh</h1>
+                <p style="font-size: 1.1rem; opacity: 0.9;">≈ ${prediction/2500:.2f} USD</p>
             </div>
         """, unsafe_allow_html=True)
+        
+        # Price distribution context
+        if raw_data is not None:
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.markdown("<div class='section-header'><h4>Price Distribution</h4></div>", unsafe_allow_html=True)
+                
+                fig = go.Figure()
+                fig.add_trace(go.Histogram(
+                    x=raw_data['Price_Tsh'],
+                    nbinsx=30,
+                    name='All Laptops',
+                    marker_color='#95a5a6'
+                ))
+                fig.add_vline(x=prediction, line_dash="dash", line_color="#2c3e50", 
+                             annotation_text="Predicted", annotation_position="top")
+                fig.update_layout(
+                    height=300,
+                    margin=dict(l=20, r=20, t=20, b=20),
+                    showlegend=False,
+                    xaxis_title="Price (Tsh)",
+                    yaxis_title="Count",
+                    plot_bgcolor='white',
+                    paper_bgcolor='white'
+                )
+                st.plotly_chart(fig, use_container_width=True)
+            
+            with col2:
+                st.markdown("<div class='section-header'><h4>Price Percentile</h4></div>", unsafe_allow_html=True)
+                
+                percentile = (raw_data['Price_Tsh'] < prediction).mean() * 100
+                
+                fig = go.Figure(go.Indicator(
+                    mode="gauge+number",
+                    value=percentile,
+                    title={'text': "Price Percentile"},
+                    gauge={
+                        'axis': {'range': [0, 100]},
+                        'bar': {'color': "#2c3e50"},
+                        'steps': [
+                            {'range': [0, 33], 'color': "#ecf0f1"},
+                            {'range': [33, 67], 'color': "#d5dbdb"},
+                            {'range': [67, 100], 'color': "#bdc3c7"}
+                        ],
+                        'threshold': {
+                            'line': {'color': "red", 'width': 4},
+                            'thickness': 0.75,
+                            'value': 90
+                        }
+                    }
+                ))
+                fig.update_layout(height=300, margin=dict(l=20, r=20, t=20, b=20))
+                st.plotly_chart(fig, use_container_width=True)
         
         # Recommendations
         if raw_data is not None:
@@ -215,35 +440,49 @@ if mode == "🔮 ML Price Predictor":
                 brand_laptops['price_diff'] = abs(brand_laptops['Price_Tsh'] - prediction)
                 recommendations = brand_laptops.nsmallest(3, 'price_diff')
                 
-                st.markdown(f"### 🎯 Suggested Products from {saved_inputs['company']}")
+                st.markdown(f"<div class='section-header'><h4>Similar Products from {saved_inputs['company']}</h4></div>", unsafe_allow_html=True)
+                
                 for i, (_, row) in enumerate(recommendations.iterrows(), 1):
                     st.markdown(f"""
                         <div class="product-card">
-                            <h4>{i}. {row['Company']} {row['Product']}</h4>
-                            <p><b>💰 Price:</b> {row['Price_Tsh']:,.0f} Tsh | 
-                            <b>💻 Type:</b> {row['TypeName']} | <b>🧠 RAM:</b> {row['Ram']} GB | 
-                            <b>💾 Storage:</b> {row['PrimaryStorage']} GB</p>
-                            <p><b>Difference:</b> {abs(row['Price_Tsh'] - prediction):,.0f} Tsh</p>
+                            <h4 style="margin-top: 0; color: #2c3e50;">{row['Company']} {row['Product']}</h4>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 0.75rem;">
+                                <div>
+                                    <p style="margin: 0.25rem 0;"><strong>Price:</strong> {row['Price_Tsh']:,.0f} Tsh</p>
+                                    <p style="margin: 0.25rem 0;"><strong>Type:</strong> {row['TypeName']}</p>
+                                </div>
+                                <div>
+                                    <p style="margin: 0.25rem 0;"><strong>RAM:</strong> {row['Ram']} GB</p>
+                                    <p style="margin: 0.25rem 0;"><strong>Storage:</strong> {row['PrimaryStorage']} GB</p>
+                                </div>
+                                <div>
+                                    <p style="margin: 0.25rem 0;"><strong>Screen:</strong> {row['Inches']}"</p>
+                                    <p style="margin: 0.25rem 0;"><strong>Difference:</strong> {abs(row['Price_Tsh'] - prediction):,.0f} Tsh</p>
+                                </div>
+                            </div>
                         </div>
                     """, unsafe_allow_html=True)
 
 # ============================================================================
 # MODE 2: BUDGET FINDER
 # ============================================================================
-elif mode == "💰 Budget Finder":
-    st.subheader("💰 Find Laptops by Budget")
-    st.markdown("*Enter your budget to see available laptops in that price range*")
+elif mode == "Budget Finder":
+    
+    st.markdown("<div class='section-header'><h3>Find Laptops by Budget</h3></div>", unsafe_allow_html=True)
     
     if raw_data is not None:
         # Budget input
+        st.markdown("**Budget Range**")
         col1, col2 = st.columns(2)
         with col1:
             min_price = st.number_input("Minimum Budget (Tsh)", 100000, 10000000, 1000000, 100000)
         with col2:
             max_price = st.number_input("Maximum Budget (Tsh)", 100000, 10000000, 3000000, 100000)
         
+        st.markdown("---")
+        
         # Filters
-        st.markdown("#### Optional Filters")
+        st.markdown("**Filter Options**")
         col1, col2, col3 = st.columns(3)
         with col1:
             brand_filter = st.multiselect("Brands", all_companies, default=[])
@@ -252,8 +491,10 @@ elif mode == "💰 Budget Finder":
         with col3:
             min_ram = st.selectbox("Minimum RAM (GB)", [0, 4, 8, 16, 32], index=0)
         
+        st.markdown("---")
+        
         # Search button
-        if st.button("🔍 Search Laptops", use_container_width=True):
+        if st.button("Search Laptops", use_container_width=True):
             results = raw_data[(raw_data['Price_Tsh'] >= min_price) & (raw_data['Price_Tsh'] <= max_price)]
             
             if brand_filter:
@@ -265,30 +506,84 @@ elif mode == "💰 Budget Finder":
             
             results = results.sort_values('Price_Tsh')
             
-            # Display results
+            # Display summary
             st.markdown(f"""
                 <div class="info-box">
-                    <h3>📊 Search Results: {len(results)} laptops found</h3>
-                    <p>Budget: {min_price:,.0f} - {max_price:,.0f} Tsh</p>
+                    <h3 style="margin-top: 0;">Search Results: {len(results)} laptops found</h3>
+                    <p style="margin-bottom: 0;">Budget Range: {min_price:,.0f} - {max_price:,.0f} Tsh</p>
                 </div>
             """, unsafe_allow_html=True)
             
             if len(results) > 0:
-                # Show top 15 results
+                # Summary statistics
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    st.markdown(f"""
+                    <div class="metric-card">
+                        <p class="stat-label">Average Price</p>
+                        <p class="stat-value" style="font-size: 1.5rem;">{results['Price_Tsh'].mean()/1000:.0f}K</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                with col2:
+                    st.markdown(f"""
+                    <div class="metric-card">
+                        <p class="stat-label">Avg RAM</p>
+                        <p class="stat-value" style="font-size: 1.5rem;">{results['Ram'].mean():.0f} GB</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                with col3:
+                    st.markdown(f"""
+                    <div class="metric-card">
+                        <p class="stat-label">Avg Storage</p>
+                        <p class="stat-value" style="font-size: 1.5rem;">{results['PrimaryStorage'].mean():.0f} GB</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                with col4:
+                    st.markdown(f"""
+                    <div class="metric-card">
+                        <p class="stat-label">Avg Screen</p>
+                        <p class="stat-value" style="font-size: 1.5rem;">{results['Inches'].mean():.1f}"</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                # Price distribution chart
+                st.markdown("<div class='section-header'><h4>Price Distribution in Range</h4></div>", unsafe_allow_html=True)
+                fig = px.histogram(results, x='Price_Tsh', nbins=20, 
+                                 color_discrete_sequence=['#2c3e50'])
+                fig.update_layout(
+                    height=250,
+                    margin=dict(l=20, r=20, t=20, b=20),
+                    showlegend=False,
+                    xaxis_title="Price (Tsh)",
+                    yaxis_title="Count",
+                    plot_bgcolor='white',
+                    paper_bgcolor='white'
+                )
+                st.plotly_chart(fig, use_container_width=True)
+                
+                # Show results
+                st.markdown("<div class='section-header'><h4>Available Laptops</h4></div>", unsafe_allow_html=True)
+                
                 for i, (_, laptop) in enumerate(results.head(15).iterrows(), 1):
                     st.markdown(f"""
                         <div class="product-card">
-                            <h4>{i}. {laptop['Company']} {laptop['Product']}</h4>
-                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                            <h4 style="margin-top: 0; color: #2c3e50;">{laptop['Company']} {laptop['Product']}</h4>
+                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 0.75rem;">
                                 <div>
-                                    <p><b>💰 Price:</b> {laptop['Price_Tsh']:,.0f} Tsh (≈ ${laptop['Price_Tsh']/2500:.0f})</p>
-                                    <p><b>💻 Type:</b> {laptop['TypeName']}</p>
-                                    <p><b>🖥️ OS:</b> {laptop['OS']}</p>
+                                    <p style="margin: 0.25rem 0;"><strong>Price:</strong> {laptop['Price_Tsh']:,.0f} Tsh</p>
+                                    <p style="margin: 0.25rem 0; color: #6c757d;">≈ ${laptop['Price_Tsh']/2500:.0f} USD</p>
                                 </div>
                                 <div>
-                                    <p><b>🧠 RAM:</b> {laptop['Ram']} GB | <b>💾 Storage:</b> {laptop['PrimaryStorage']} GB</p>
-                                    <p><b>📺 Screen:</b> {laptop['Inches']}"</p>
-                                    <p><b>⚙️ CPU:</b> {laptop['CPU_company']} {laptop['CPU_model']}</p>
+                                    <p style="margin: 0.25rem 0;"><strong>Type:</strong> {laptop['TypeName']}</p>
+                                    <p style="margin: 0.25rem 0;"><strong>OS:</strong> {laptop['OS']}</p>
+                                </div>
+                                <div>
+                                    <p style="margin: 0.25rem 0;"><strong>RAM:</strong> {laptop['Ram']} GB</p>
+                                    <p style="margin: 0.25rem 0;"><strong>Storage:</strong> {laptop['PrimaryStorage']} GB</p>
+                                </div>
+                                <div>
+                                    <p style="margin: 0.25rem 0;"><strong>Screen:</strong> {laptop['Inches']}"</p>
+                                    <p style="margin: 0.25rem 0;"><strong>CPU:</strong> {laptop['CPU_company']}</p>
                                 </div>
                             </div>
                         </div>
@@ -301,31 +596,142 @@ elif mode == "💰 Budget Finder":
     else:
         st.error("Dataset not available. Please ensure laptop_prices.csv is in the app directory.")
 
-# Sidebar
-with st.sidebar:
-    st.title("About")
-    st.markdown(f"""
-        ### 🎯 Two Modes Available:
+# ============================================================================
+# MODE 3: MODEL ANALYTICS
+# ============================================================================
+elif mode == "Model Analytics":
+    
+    st.markdown("<div class='section-header'><h3>Model Performance Analytics</h3></div>", unsafe_allow_html=True)
+    
+    # Performance metrics
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown(f"""
+        <div class="metric-card">
+            <p class="stat-label">R² Score</p>
+            <p class="stat-value">{model_data['test_r2_score']:.4f}</p>
+            <p style="margin: 0; color: #6c757d; font-size: 0.85rem;">Coefficient of Determination</p>
+        </div>
+        """, unsafe_allow_html=True)
+    with col2:
+        st.markdown(f"""
+        <div class="metric-card">
+            <p class="stat-label">RMSE</p>
+            <p class="stat-value">{model_data['test_rmse']:,.0f}</p>
+            <p style="margin: 0; color: #6c757d; font-size: 0.85rem;">Root Mean Square Error (Tsh)</p>
+        </div>
+        """, unsafe_allow_html=True)
+    with col3:
+        st.markdown(f"""
+        <div class="metric-card">
+            <p class="stat-label">Model Type</p>
+            <p class="stat-value" style="font-size: 1.5rem;">{model_name}</p>
+            <p style="margin: 0; color: #6c757d; font-size: 0.85rem;">{len(feature_names)} features</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    if raw_data is not None:
+        st.markdown("---")
         
-        **🔮 ML Price Predictor**
-        - Enter laptop specs
-        - Get AI price prediction
-        - See similar products
+        # Dataset statistics
+        st.markdown("<div class='section-header'><h4>Dataset Statistics</h4></div>", unsafe_allow_html=True)
         
-        **💰 Budget Finder**
-        - Enter your budget
-        - Find available laptops
-        - Filter by preferences
+        col1, col2 = st.columns(2)
         
-        ---
+        with col1:
+            st.markdown("**Price Distribution**")
+            fig = px.histogram(raw_data, x='Price_Tsh', nbins=40,
+                             color_discrete_sequence=['#2c3e50'])
+            fig.update_layout(
+                height=300,
+                margin=dict(l=20, r=20, t=20, b=20),
+                showlegend=False,
+                xaxis_title="Price (Tsh)",
+                yaxis_title="Frequency",
+                plot_bgcolor='white',
+                paper_bgcolor='white'
+            )
+            st.plotly_chart(fig, use_container_width=True)
+            
+            st.markdown("**RAM Distribution**")
+            ram_counts = raw_data['Ram'].value_counts().sort_index()
+            fig = px.bar(x=ram_counts.index, y=ram_counts.values,
+                        color_discrete_sequence=['#2c3e50'])
+            fig.update_layout(
+                height=300,
+                margin=dict(l=20, r=20, t=20, b=20),
+                showlegend=False,
+                xaxis_title="RAM (GB)",
+                yaxis_title="Count",
+                plot_bgcolor='white',
+                paper_bgcolor='white'
+            )
+            st.plotly_chart(fig, use_container_width=True)
         
-        ### 📊 Model Info
-        - Type: {model_name}
-        - Accuracy: {model_data['test_r2_score']:.1%}
-        - Features: {len(feature_names)}
-        - Dataset: 1,275 laptops
+        with col2:
+            st.markdown("**Price by Brand**")
+            brand_prices = raw_data.groupby('Company')['Price_Tsh'].mean().sort_values(ascending=True).tail(10)
+            fig = px.bar(x=brand_prices.values, y=brand_prices.index, orientation='h',
+                        color_discrete_sequence=['#2c3e50'])
+            fig.update_layout(
+                height=300,
+                margin=dict(l=20, r=20, t=20, b=20),
+                showlegend=False,
+                xaxis_title="Average Price (Tsh)",
+                yaxis_title="Brand",
+                plot_bgcolor='white',
+                paper_bgcolor='white'
+            )
+            st.plotly_chart(fig, use_container_width=True)
+            
+            st.markdown("**Type Distribution**")
+            type_counts = raw_data['TypeName'].value_counts()
+            fig = px.pie(values=type_counts.values, names=type_counts.index,
+                        color_discrete_sequence=['#2c3e50', '#34495e', '#4a5f7f', '#5d6d7e', '#7b8794'])
+            fig.update_layout(
+                height=300,
+                margin=dict(l=20, r=20, t=20, b=20),
+                showlegend=True
+            )
+            st.plotly_chart(fig, use_container_width=True)
         
-        ---
+        st.markdown("---")
         
-        Made with ❤️ using ML & Streamlit
-    """)
+        # Feature importance (if available in model_data)
+        st.markdown("<div class='section-header'><h4>Model Features</h4></div>", unsafe_allow_html=True)
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("**Numerical Features:**")
+            numerical_features = ['Inches', 'Ram', 'Weight', 'CPU_freq', 'PrimaryStorage']
+            for feat in numerical_features:
+                if feat in feature_names:
+                    st.write(f"- {feat}")
+        
+        with col2:
+            st.markdown("**Categorical Features:**")
+            categorical_features = ['Company', 'TypeName', 'OS', 'CPU_company', 'GPU_company', 
+                                   'Touchscreen', 'IPSpanel', 'RetinaDisplay']
+            for feat in categorical_features:
+                if feat in feature_names:
+                    st.write(f"- {feat}")
+        
+        st.markdown("---")
+        
+        # Summary statistics
+        st.markdown("<div class='section-header'><h4>Dataset Summary</h4></div>", unsafe_allow_html=True)
+        
+        summary_stats = pd.DataFrame({
+            'Metric': ['Total Laptops', 'Brands', 'Avg Price', 'Min Price', 'Max Price', 'Avg RAM', 'Avg Storage'],
+            'Value': [
+                f"{len(raw_data):,}",
+                f"{raw_data['Company'].nunique()}",
+                f"{raw_data['Price_Tsh'].mean():,.0f} Tsh",
+                f"{raw_data['Price_Tsh'].min():,.0f} Tsh",
+                f"{raw_data['Price_Tsh'].max():,.0f} Tsh",
+                f"{raw_data['Ram'].mean():.1f} GB",
+                f"{raw_data['PrimaryStorage'].mean():.0f} GB"
+            ]
+        })
+        
+        st.dataframe(summary_stats, use_container_width=True, hide_index=True)
