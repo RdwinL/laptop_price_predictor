@@ -386,8 +386,6 @@ if mode == "Price Predictor":
                     border: 2px solid #e74c3c !important;
                     box-shadow: 0 4px 10px rgba(231, 76, 60, 0.4);
                 }
-
-            </style>
             </style>
         """, unsafe_allow_html=True)
         if st.button("🔄 Reset", use_container_width=True, type="secondary", key="reset_btn"):
