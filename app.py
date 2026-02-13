@@ -7,7 +7,7 @@ import plotly.express as px
 
 # Page configuration
 st.set_page_config(
-    page_title="Laptop Price Predictor",
+    page_title="Laptop Price Intelligence",
     page_icon="💻",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -35,7 +35,7 @@ st.markdown("""
     
     /* Cards */
     .metric-card {
-        background: lavender;
+        background: white;
         border: 1px solid #e0e0e0;
         border-radius: 8px;
         padding: 1.5rem;
@@ -207,7 +207,7 @@ all_companies = sorted(brand_os_map.keys())
 
 # Sidebar
 with st.sidebar:
-    st.title("Laptop Price Predictor")
+    st.title("Laptop Price Intelligence")
     st.markdown("---")
     
     # Mode selection in sidebar
@@ -269,7 +269,7 @@ with st.sidebar:
         """)
 
 # Main content
-st.title("Laptop Price Predictor")
+st.title("Laptop Price Intelligence System")
 st.markdown("Machine learning-powered laptop price prediction and budget analysis")
 
 # ============================================================================
@@ -738,9 +738,6 @@ elif mode == "Model Analytics":
             )
             st.plotly_chart(fig, use_container_width=True)
         
-        st.markdown("---")
-        
-        # Feature importance (if available in model_data)
         st.markdown("---")
         
         # Correlation heatmap
