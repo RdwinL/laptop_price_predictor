@@ -382,6 +382,8 @@ if mode == "Price Predictor":
             background: white !important;
             color: #e74c3c !important;
             border: 2px solid #e74c3c !important;
+            font-size: 20px !important;
+            font-weight: 600 !important;
         }
         button[kind="secondary"]:hover {
             background: #DC0E0E !important;
