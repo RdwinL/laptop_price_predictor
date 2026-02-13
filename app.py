@@ -13,7 +13,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS with professional styling
+# Custom CSS with professional styling and color accents
 st.markdown("""
     <style>
     /* Global styles */
@@ -41,22 +41,29 @@ st.markdown("""
         padding: 1.5rem;
         margin: 1rem 0;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border-top: 3px solid #3498db;
+        transition: all 0.2s ease;
+    }
+    
+    .metric-card:hover {
+        border-top-color: #2980b9;
+        box-shadow: 0 4px 8px rgba(52, 152, 219, 0.15);
     }
     
     .prediction-card {
-        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
         border-radius: 8px;
         padding: 2rem;
         color: white;
         text-align: center;
         margin: 2rem 0;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
     }
     
     .product-card {
         background: white;
         border: 1px solid #e0e0e0;
-        border-left: 4px solid #2c3e50;
+        border-left: 4px solid #3498db;
         border-radius: 6px;
         padding: 1.25rem;
         margin: 0.75rem 0;
@@ -64,14 +71,15 @@ st.markdown("""
     }
     
     .product-card:hover {
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
         transform: translateY(-2px);
+        border-left-color: #2980b9;
     }
     
     /* Section headers */
     .section-header {
-        background: #f8f9fa;
-        border-left: 4px solid #2c3e50;
+        background: linear-gradient(to right, #ebf5fb 0%, #f8f9fa 100%);
+        border-left: 4px solid #3498db;
         padding: 0.75rem 1rem;
         margin: 1.5rem 0 1rem 0;
         border-radius: 4px;
@@ -79,8 +87,9 @@ st.markdown("""
     
     /* Info boxes */
     .info-box {
-        background: #f8f9fa;
-        border: 1px solid #dee2e6;
+        background: linear-gradient(to right, #ebf5fb 0%, #f8f9fa 100%);
+        border: 1px solid #d6eaf8;
+        border-left: 3px solid #3498db;
         border-radius: 6px;
         padding: 1rem;
         margin: 1rem 0;
@@ -89,7 +98,7 @@ st.markdown("""
     /* Buttons */
     .stButton>button {
         width: 100%;
-        background-color: #2c3e50;
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
         color: white;
         font-size: 16px;
         font-weight: 500;
@@ -100,13 +109,14 @@ st.markdown("""
     }
     
     .stButton>button:hover {
-        background-color: #1a252f;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        background: linear-gradient(135deg, #2980b9 0%, #21618c 100%);
+        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+        transform: translateY(-1px);
     }
     
     /* Sidebar */
     .css-1d391kg {
-        background-color: #f8f9fa;
+        background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
     }
     
     /* Remove extra padding */
@@ -119,7 +129,7 @@ st.markdown("""
     .stat-value {
         font-size: 2rem;
         font-weight: 600;
-        color: #2c3e50;
+        color: #2980b9;
         margin: 0;
     }
     
@@ -128,6 +138,20 @@ st.markdown("""
         color: #6c757d;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+    }
+    
+    /* Radio buttons accent */
+    .stRadio > label {
+        color: #2c3e50;
+    }
+    
+    /* Selectbox accent */
+    div[data-baseweb="select"] > div {
+        border-color: #d6eaf8;
+    }
+    
+    div[data-baseweb="select"] > div:hover {
+        border-color: #3498db;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -391,9 +415,9 @@ if mode == "Price Predictor":
                     x=raw_data['Price_Tsh'],
                     nbinsx=30,
                     name='All Laptops',
-                    marker_color='#95a5a6'
+                    marker_color='#a5c9e6'
                 ))
-                fig.add_vline(x=prediction, line_dash="dash", line_color="#2c3e50", 
+                fig.add_vline(x=prediction, line_dash="dash", line_color="#3498db", 
                              annotation_text="Predicted", annotation_position="top")
                 fig.update_layout(
                     height=300,
@@ -417,14 +441,14 @@ if mode == "Price Predictor":
                     title={'text': "Price Percentile"},
                     gauge={
                         'axis': {'range': [0, 100]},
-                        'bar': {'color': "#2c3e50"},
+                        'bar': {'color': "#3498db"},
                         'steps': [
-                            {'range': [0, 33], 'color': "#ecf0f1"},
-                            {'range': [33, 67], 'color': "#d5dbdb"},
-                            {'range': [67, 100], 'color': "#bdc3c7"}
+                            {'range': [0, 33], 'color': "#ebf5fb"},
+                            {'range': [33, 67], 'color': "#d6eaf8"},
+                            {'range': [67, 100], 'color': "#a9cce3"}
                         ],
                         'threshold': {
-                            'line': {'color': "red", 'width': 4},
+                            'line': {'color': "#e74c3c", 'width': 4},
                             'thickness': 0.75,
                             'value': 90
                         }
@@ -445,7 +469,7 @@ if mode == "Price Predictor":
                 for i, (_, row) in enumerate(recommendations.iterrows(), 1):
                     st.markdown(f"""
                         <div class="product-card">
-                            <h4 style="margin-top: 0; color: #2c3e50;">{row['Company']} {row['Product']}</h4>
+                            <h4 style="margin-top: 0; color: #2980b9;">{row['Company']} {row['Product']}</h4>
                             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 0.75rem;">
                                 <div>
                                     <p style="margin: 0.25rem 0;"><strong>Price:</strong> {row['Price_Tsh']:,.0f} Tsh</p>
@@ -549,7 +573,7 @@ elif mode == "Budget Finder":
                 # Price distribution chart
                 st.markdown("<div class='section-header'><h4>Price Distribution in Range</h4></div>", unsafe_allow_html=True)
                 fig = px.histogram(results, x='Price_Tsh', nbins=20, 
-                                 color_discrete_sequence=['#2c3e50'])
+                                 color_discrete_sequence=['#3498db'])
                 fig.update_layout(
                     height=250,
                     margin=dict(l=20, r=20, t=20, b=20),
@@ -567,7 +591,7 @@ elif mode == "Budget Finder":
                 for i, (_, laptop) in enumerate(results.head(15).iterrows(), 1):
                     st.markdown(f"""
                         <div class="product-card">
-                            <h4 style="margin-top: 0; color: #2c3e50;">{laptop['Company']} {laptop['Product']}</h4>
+                            <h4 style="margin-top: 0; color: #2980b9;">{laptop['Company']} {laptop['Product']}</h4>
                             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 0.75rem;">
                                 <div>
                                     <p style="margin: 0.25rem 0;"><strong>Price:</strong> {laptop['Price_Tsh']:,.0f} Tsh</p>
@@ -641,7 +665,7 @@ elif mode == "Model Analytics":
         with col1:
             st.markdown("**Price Distribution**")
             fig = px.histogram(raw_data, x='Price_Tsh', nbins=40,
-                             color_discrete_sequence=['#2c3e50'])
+                             color_discrete_sequence=['#3498db'])
             fig.update_layout(
                 height=300,
                 margin=dict(l=20, r=20, t=20, b=20),
@@ -656,7 +680,7 @@ elif mode == "Model Analytics":
             st.markdown("**RAM Distribution**")
             ram_counts = raw_data['Ram'].value_counts().sort_index()
             fig = px.bar(x=ram_counts.index, y=ram_counts.values,
-                        color_discrete_sequence=['#2c3e50'])
+                        color_discrete_sequence=['#3498db'])
             fig.update_layout(
                 height=300,
                 margin=dict(l=20, r=20, t=20, b=20),
@@ -672,7 +696,7 @@ elif mode == "Model Analytics":
             st.markdown("**Price by Brand**")
             brand_prices = raw_data.groupby('Company')['Price_Tsh'].mean().sort_values(ascending=True).tail(10)
             fig = px.bar(x=brand_prices.values, y=brand_prices.index, orientation='h',
-                        color_discrete_sequence=['#2c3e50'])
+                        color_discrete_sequence=['#3498db'])
             fig.update_layout(
                 height=300,
                 margin=dict(l=20, r=20, t=20, b=20),
@@ -687,7 +711,7 @@ elif mode == "Model Analytics":
             st.markdown("**Type Distribution**")
             type_counts = raw_data['TypeName'].value_counts()
             fig = px.pie(values=type_counts.values, names=type_counts.index,
-                        color_discrete_sequence=['#2c3e50', '#34495e', '#4a5f7f', '#5d6d7e', '#7b8794'])
+                        color_discrete_sequence=['#3498db', '#5dade2', '#85c1e9', '#aed6f1', '#d6eaf8'])
             fig.update_layout(
                 height=300,
                 margin=dict(l=20, r=20, t=20, b=20),
