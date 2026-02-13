@@ -379,14 +379,6 @@ if mode == "Price Predictor":
             # Main Action Buttons
             col1, col2 = st.columns([5, 2])
             
-            with col1:
-                predict_button = st.button(
-                    "🔮 Predict Price",
-                    use_container_width=True,
-                    type="primary",
-                    key="main_predict"
-                )
-            
             with col2:
                 if st.button(
                     "🔄 Reset",
