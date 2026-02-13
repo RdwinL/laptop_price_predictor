@@ -97,7 +97,6 @@ st.markdown("""
     
     /* Buttons */
     .stButton>button {
-        width: 100%;
         background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
         color: white;
         font-size: 16px;
@@ -364,7 +363,7 @@ if mode == "Price Predictor":
     st.markdown("---")
     
     # Main Action Button - Predict Price
-    col1, col2 = st.columns([5, 1])
+    col1, col2 = st.columns([6, 1])
     with col1:
         predict_button = st.button("🔮 Predict Price", use_container_width=True, type="primary", key="main_predict")
     with col2:
