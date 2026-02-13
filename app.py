@@ -385,11 +385,17 @@ if mode == "Price Predictor":
             }
             /* Ensure primary button has same height */
             button[kind="primary"] {
-                 display: flex !important;
+                display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
+                padding: 0.5rem 1rem !important;
                 min-height: 2.5rem !important;
                 height: 2.5rem !important;
+                height: auto !important;
+            }
+            button[kind="primary"] p {
+                margin: 0 !important;
+                line-height: 1.5 !important;
             }
             </style>
         """, unsafe_allow_html=True)
