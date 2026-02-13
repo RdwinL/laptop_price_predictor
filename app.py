@@ -7,7 +7,7 @@ import plotly.express as px
 
 # Page configuration
 st.set_page_config(
-    page_title="Laptop Price Intelligence",
+    page_title="Laptop Price Predictor",
     page_icon="💻",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -35,7 +35,7 @@ st.markdown("""
     
     /* Cards */
     .metric-card {
-        background: white;
+        background: lavender;
         border: 1px solid #e0e0e0;
         border-radius: 8px;
         padding: 1.5rem;
@@ -207,7 +207,7 @@ all_companies = sorted(brand_os_map.keys())
 
 # Sidebar
 with st.sidebar:
-    st.title("Laptop Price Intelligence")
+    st.title("Laptop Price Predictor")
     st.markdown("---")
     
     # Mode selection in sidebar
@@ -269,7 +269,7 @@ with st.sidebar:
         """)
 
 # Main content
-st.title("Laptop Price Intelligence System")
+st.title("Laptop Price Predictor")
 st.markdown("Machine learning-powered laptop price prediction and budget analysis")
 
 # ============================================================================
@@ -737,82 +737,6 @@ elif mode == "Model Analytics":
                 showlegend=True
             )
             st.plotly_chart(fig, use_container_width=True)
-        
-        st.markdown("---")
-        
-        # Correlation heatmap
-        st.markdown("<div class='section-header'><h4>Feature Correlation Analysis</h4></div>", unsafe_allow_html=True)
-        
-        # Select numerical columns for correlation
-        numerical_cols = ['Price_Tsh', 'Inches', 'Ram', 'Weight', 'CPU_freq', 'PrimaryStorage']
-        
-        # Add binary columns if they exist
-        if 'Touchscreen' in raw_data.columns:
-            numerical_cols.append('Touchscreen')
-        if 'IPSpanel' in raw_data.columns:
-            numerical_cols.append('IPSpanel')
-        if 'RetinaDisplay' in raw_data.columns:
-            numerical_cols.append('RetinaDisplay')
-        
-        # Filter only existing columns
-        available_cols = [col for col in numerical_cols if col in raw_data.columns]
-        
-        if len(available_cols) > 1:
-            corr_data = raw_data[available_cols].corr()
-            
-            fig = go.Figure(data=go.Heatmap(
-                z=corr_data.values,
-                x=corr_data.columns,
-                y=corr_data.columns,
-                colorscale=[
-                    [0, '#d6eaf8'],
-                    [0.5, '#ffffff'],
-                    [1, '#3498db']
-                ],
-                zmid=0,
-                text=corr_data.values,
-                texttemplate='%{text:.2f}',
-                textfont={"size": 10},
-                colorbar=dict(title="Correlation")
-            ))
-            
-            fig.update_layout(
-                height=500,
-                margin=dict(l=100, r=20, t=20, b=100),
-                xaxis={'side': 'bottom'},
-                yaxis={'autorange': 'reversed'},
-                plot_bgcolor='white',
-                paper_bgcolor='white'
-            )
-            
-            st.plotly_chart(fig, use_container_width=True)
-            
-            # Correlation insights
-            col1, col2 = st.columns(2)
-            with col1:
-                st.markdown("**Strongest Positive Correlations:**")
-                # Get upper triangle of correlation matrix
-                corr_pairs = []
-                for i in range(len(corr_data.columns)):
-                    for j in range(i+1, len(corr_data.columns)):
-                        corr_pairs.append({
-                            'Feature 1': corr_data.columns[i],
-                            'Feature 2': corr_data.columns[j],
-                            'Correlation': corr_data.iloc[i, j]
-                        })
-                
-                corr_df = pd.DataFrame(corr_pairs)
-                top_positive = corr_df.nlargest(3, 'Correlation')
-                
-                for _, row in top_positive.iterrows():
-                    st.write(f"• **{row['Feature 1']}** ↔ **{row['Feature 2']}**: {row['Correlation']:.3f}")
-            
-            with col2:
-                st.markdown("**Strongest Negative Correlations:**")
-                top_negative = corr_df.nsmallest(3, 'Correlation')
-                
-                for _, row in top_negative.iterrows():
-                    st.write(f"• **{row['Feature 1']}** ↔ **{row['Feature 2']}**: {row['Correlation']:.3f}")
         
         st.markdown("---")
         
