@@ -360,10 +360,10 @@ if mode == "Price Predictor":
     with col3:
         retina_display = st.radio("Retina Display", ["No", "Yes"], horizontal=True, key='retina_select')
     
-     st.markdown("---")
+    st.markdown("---")
     
     # Button styling - place before buttons
-     st.markdown("""
+    st.markdown("""
         <style>
         /* Primary button - centered text */
         button[kind="primary"] {
