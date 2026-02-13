@@ -371,12 +371,22 @@ if mode == "Price Predictor":
             <style>
             /* Red reset button styling */
             button[kind="secondary"] {
-                background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important;
-                color: white !important;
+                background: white !important;
+                color: #e74c3c !important;
+                border: 2px solid #e74c3c !important;
+                min-height: 2.5rem !important;
+                height: 2.5rem !important;
+                
             }
             button[kind="secondary"]:hover {
-                background: linear-gradient(135deg, #c0392b 0%, #a93226 100%) !important;
+                background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important;
+                color: white !important;
                 box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4) !important;
+            }
+            /* Ensure primary button has same height */
+            button[kind="primary"] {
+                min-height: 2.5rem !important;
+                height: 2.5rem !important;
             }
             </style>
         """, unsafe_allow_html=True)
