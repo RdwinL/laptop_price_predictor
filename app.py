@@ -368,10 +368,10 @@ if mode == "Price Predictor":
     with col1:
         predict_button = st.button("🔮 Predict Price", use_container_width=True, type="primary", key="main_predict")
     with col2:
-    # CSS (place once before buttons)
-    st.markdown("""
-    <style>
-
+   # CSS (place once before buttons)
+st.markdown("""
+        <style>
+        
         /* Reset button default white */
         div[data-testid="stButton"] button[key="reset_btn"] {
             background-color: white !important;
@@ -388,10 +388,11 @@ if mode == "Price Predictor":
             box-shadow: 0 4px 10px rgba(231, 76, 60, 0.4);
         }
         
-    </style>
+        </style>
         """, unsafe_allow_html=True)
         
-        # Buttons aligned
+        
+        # Main Action Buttons
         col1, col2 = st.columns([5, 2])
         
         with col1:
@@ -410,6 +411,7 @@ if mode == "Price Predictor":
             ):
                 st.session_state.prediction_made = False
                 st.rerun()
+
 
     
     if predict_button:
