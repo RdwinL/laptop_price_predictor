@@ -207,7 +207,7 @@ all_companies = sorted(brand_os_map.keys())
 
 # Sidebar
 with st.sidebar:
-    st.title("Laptop Price Intelligence")
+    st.title("Laptop Price Predictor")
     st.markdown("---")
     
     # Mode selection in sidebar
@@ -269,7 +269,7 @@ with st.sidebar:
         """)
 
 # Main content
-st.title("Laptop Price Intelligence System")
+st.title("Laptop Price Predictor")
 st.markdown("Machine learning-powered laptop price prediction and budget analysis")
 
 # ============================================================================
