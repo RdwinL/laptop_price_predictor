@@ -1017,30 +1017,51 @@ elif mode == "Model Comparison":
         with col1:
             st.markdown("**Linear Regression - Fitting Line**")
             
-            # Sample data for visualization (use actual vs predicted if available)
-            # Using RAM as a simple feature for visualization
+            # Sample data for visualization
             sample_data = raw_data.sample(min(200, len(raw_data))).copy()
             sample_data = sample_data.sort_values('Ram')
             
-            # Create scatter plot with regression line
-            fig = px.scatter(sample_data, x='Ram', y='Price_Tsh', 
-                           opacity=0.5,
-                           color_discrete_sequence=['#3498db'],
-                           labels={'Ram': 'RAM (GB)', 'Price_Tsh': 'Price (Tsh)'})
+            # Calculate simple linear regression manually
+            x = sample_data['Ram'].values
+            y = sample_data['Price_Tsh'].values
             
-            # Add trend line
-            fig.add_traces(
-                px.scatter(sample_data, x='Ram', y='Price_Tsh', 
-                          trendline="ols",
-                          color_discrete_sequence=['#e74c3c']).data[1]
-            )
+            # Calculate slope and intercept
+            x_mean = np.mean(x)
+            y_mean = np.mean(y)
+            slope = np.sum((x - x_mean) * (y - y_mean)) / np.sum((x - x_mean)**2)
+            intercept = y_mean - slope * x_mean
+            
+            # Generate line points
+            x_line = np.array([x.min(), x.max()])
+            y_line = slope * x_line + intercept
+            
+            # Create scatter plot
+            fig = go.Figure()
+            
+            # Add scatter points
+            fig.add_trace(go.Scatter(
+                x=x, y=y,
+                mode='markers',
+                marker=dict(size=8, color='#3498db', opacity=0.5),
+                name='Actual Data'
+            ))
+            
+            # Add regression line
+            fig.add_trace(go.Scatter(
+                x=x_line, y=y_line,
+                mode='lines',
+                line=dict(color='#e74c3c', width=3),
+                name='Linear Fit'
+            ))
             
             fig.update_layout(
                 height=400,
-                showlegend=False,
+                showlegend=True,
                 plot_bgcolor='white',
                 paper_bgcolor='white',
-                title='Linear Regression Fit (RAM vs Price)'
+                title='Linear Regression Fit (RAM vs Price)',
+                xaxis_title='RAM (GB)',
+                yaxis_title='Price (Tsh)'
             )
             st.plotly_chart(fig, use_container_width=True)
             
