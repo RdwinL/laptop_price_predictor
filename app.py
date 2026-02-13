@@ -139,15 +139,25 @@ st.markdown("""
         letter-spacing: 0.5px;
     }
     
-    /* Radio buttons accent */
+   /* Radio buttons accent */
     .stRadio > label {
+        color: #2c3e50;
+    }
+    
+    .stRadio div[role="radiogroup"] label {
+        font-size: 14px;
+    }
+    
+    /* Sidebar radio buttons - larger font */
+    [data-testid="stSidebar"] .stRadio > label {
         color: #1A2A4F;
         font-size: 18px !important;
         font-weight: 600 !important;
     }
-    .stRadio div[role="radiogroup"] label {
+    
+    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {
         font-size: 16px !important;
-        }
+    }
     
     /* Selectbox accent */
     div[data-baseweb="select"] > div {
