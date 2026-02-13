@@ -368,50 +368,34 @@ if mode == "Price Predictor":
     with col1:
         predict_button = st.button("🔮 Predict Price", use_container_width=True, type="primary", key="main_predict")
     with col2:
-   # CSS (place once before buttons)
-        st.markdown("""
-        <style>
-        
-        /* Reset button default white */
-        div[data-testid="stButton"] button[key="reset_btn"] {
-            background-color: white !important;
-            color: #c0392b !important;
-            border: 2px solid #c0392b !important;
-            font-weight: 600;
-        }
-        
-        /* Hover → red */
-        div[data-testid="stButton"] button[key="reset_btn"]:hover {
-            background-color: #e74c3c !important;
-            color: white !important;
-            border: 2px solid #e74c3c !important;
-            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.4);
-        }
-        
-        </style>
-        """, unsafe_allow_html=True)
-        
-        
-        # Main Action Buttons
-        col1, col2 = st.columns([5, 2])
-        
-        with col1:
-            predict_button = st.button(
-                "🔮 Predict Price",
-                use_container_width=True,
-                type="primary",
-                key="main_predict"
-            )
-        
-        with col2:
-            if st.button(
-                "🔄 Reset",
-                use_container_width=True,
-                key="reset_btn"
-            ):
-                st.session_state.prediction_made = False
-                st.rerun()
-
+       # CSS (place once before buttons)
+            st.markdown("""
+            <style>
+            ...
+            </style>
+            """, unsafe_allow_html=True)
+            
+            
+            # Main Action Buttons
+            col1, col2 = st.columns([5, 2])
+            
+            with col1:
+                predict_button = st.button(
+                    "🔮 Predict Price",
+                    use_container_width=True,
+                    type="primary",
+                    key="main_predict"
+                )
+            
+            with col2:
+                if st.button(
+                    "🔄 Reset",
+                    use_container_width=True,
+                    key="reset_btn"
+                ):
+                    st.session_state.prediction_made = False
+                    st.rerun()
+    
 
     
     if predict_button:
