@@ -142,7 +142,12 @@ st.markdown("""
     /* Radio buttons accent */
     .stRadio > label {
         color: #1A2A4F;
+        font-size: 18px !important;
+        font-weight: 600 !important;
     }
+    .stRadio div[role="radiogroup"] label {
+        font-size: 16px !important;
+        }
     
     /* Selectbox accent */
     div[data-baseweb="select"] > div {
