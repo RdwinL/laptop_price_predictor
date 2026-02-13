@@ -369,7 +369,7 @@ if mode == "Price Predictor":
         predict_button = st.button("🔮 Predict Price", use_container_width=True, type="primary", key="main_predict")
     with col2:
     # CSS (place once before buttons)
-st.markdown("""
+    st.markdown("""
     <style>
 
         /* Reset button default white */
