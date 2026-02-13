@@ -1006,7 +1006,146 @@ elif mode == "Model Comparison":
             paper_bgcolor='white'
         )
         st.plotly_chart(fig, use_container_width=True)
+    st.markdown("---")
     
+    # Model Visualizations
+    st.markdown("<div class='section-header'><h4>Model Visualizations</h4></div>", unsafe_allow_html=True)
+    
+    if raw_data is not None:
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("**Linear Regression - Fitting Line**")
+            
+            # Sample data for visualization (use actual vs predicted if available)
+            # Using RAM as a simple feature for visualization
+            sample_data = raw_data.sample(min(200, len(raw_data))).copy()
+            sample_data = sample_data.sort_values('Ram')
+            
+            # Create scatter plot with regression line
+            fig = px.scatter(sample_data, x='Ram', y='Price_Tsh', 
+                           opacity=0.5,
+                           color_discrete_sequence=['#3498db'],
+                           labels={'Ram': 'RAM (GB)', 'Price_Tsh': 'Price (Tsh)'})
+            
+            # Add trend line
+            fig.add_traces(
+                px.scatter(sample_data, x='Ram', y='Price_Tsh', 
+                          trendline="ols",
+                          color_discrete_sequence=['#e74c3c']).data[1]
+            )
+            
+            fig.update_layout(
+                height=400,
+                showlegend=False,
+                plot_bgcolor='white',
+                paper_bgcolor='white',
+                title='Linear Regression Fit (RAM vs Price)'
+            )
+            st.plotly_chart(fig, use_container_width=True)
+            
+            st.markdown("""
+            <div style="background: #f8f9fa; padding: 0.75rem; border-radius: 4px; font-size: 0.9rem;">
+                <strong>Note:</strong> The red line shows the linear relationship that the model learns. 
+                Linear Regression assumes a straight-line relationship between features and price.
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            st.markdown("**Decision Tree - Structure Visualization**")
+            
+            # Create a simple decision tree visualization
+            # This is a conceptual representation
+            fig = go.Figure()
+            
+            # Tree structure (simplified representation)
+            # Root node
+            fig.add_trace(go.Scatter(
+                x=[0.5], y=[1.0],
+                mode='markers+text',
+                marker=dict(size=40, color='#3498db'),
+                text=['Root<br>RAM'],
+                textposition='middle center',
+                textfont=dict(size=10, color='white'),
+                showlegend=False
+            ))
+            
+            # Level 1 nodes
+            fig.add_trace(go.Scatter(
+                x=[0.25, 0.75], y=[0.7, 0.7],
+                mode='markers+text',
+                marker=dict(size=35, color='#5dade2'),
+                text=['RAM≤8GB', 'RAM>8GB'],
+                textposition='middle center',
+                textfont=dict(size=9, color='white'),
+                showlegend=False
+            ))
+            
+            # Level 2 nodes
+            fig.add_trace(go.Scatter(
+                x=[0.15, 0.35, 0.65, 0.85], y=[0.4, 0.4, 0.4, 0.4],
+                mode='markers+text',
+                marker=dict(size=30, color='#85c1e9'),
+                text=['Storage<br>≤256GB', 'Storage<br>>256GB', 'CPU<br>Intel', 'CPU<br>AMD'],
+                textposition='middle center',
+                textfont=dict(size=8, color='white'),
+                showlegend=False
+            ))
+            
+            # Leaf nodes
+            fig.add_trace(go.Scatter(
+                x=[0.1, 0.2, 0.3, 0.4, 0.6, 0.7, 0.8, 0.9], y=[0.1]*8,
+                mode='markers+text',
+                marker=dict(size=25, color='#aed6f1'),
+                text=['800K', '1.2M', '1.5M', '1.8M', '2.0M', '2.5M', '2.8M', '3.2M'],
+                textposition='middle center',
+                textfont=dict(size=8, color='#2c3e50'),
+                showlegend=False
+            ))
+            
+            # Add connecting lines
+            # Root to Level 1
+            fig.add_trace(go.Scatter(x=[0.5, 0.25], y=[1.0, 0.7], mode='lines', 
+                                    line=dict(color='#95a5a6', width=2), showlegend=False))
+            fig.add_trace(go.Scatter(x=[0.5, 0.75], y=[1.0, 0.7], mode='lines', 
+                                    line=dict(color='#95a5a6', width=2), showlegend=False))
+            
+            # Level 1 to Level 2
+            for x1, x2_list in [(0.25, [0.15, 0.35]), (0.75, [0.65, 0.85])]:
+                for x2 in x2_list:
+                    fig.add_trace(go.Scatter(x=[x1, x2], y=[0.7, 0.4], mode='lines',
+                                           line=dict(color='#95a5a6', width=1.5), showlegend=False))
+            
+            # Level 2 to Leaves
+            for x1, x2_list in [(0.15, [0.1, 0.2]), (0.35, [0.3, 0.4]), 
+                               (0.65, [0.6, 0.7]), (0.85, [0.8, 0.9])]:
+                for x2 in x2_list:
+                    fig.add_trace(go.Scatter(x=[x1, x2], y=[0.4, 0.1], mode='lines',
+                                           line=dict(color='#95a5a6', width=1), showlegend=False))
+            
+            fig.update_layout(
+                height=400,
+                showlegend=False,
+                xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                plot_bgcolor='white',
+                paper_bgcolor='white',
+                title='Decision Tree Structure (Simplified)',
+                margin=dict(l=20, r=20, t=40, b=20)
+            )
+            
+            st.plotly_chart(fig, use_container_width=True)
+            
+            st.markdown("""
+            <div style="background: #f8f9fa; padding: 0.75rem; border-radius: 4px; font-size: 0.9rem;">
+                <strong>Note:</strong> Decision Tree splits data based on feature thresholds, 
+                creating a tree structure that can capture complex non-linear relationships.
+            </div>
+            """, unsafe_allow_html=True)
+    
+    st.markdown("---")
+    
+    # Recommendation
     st.markdown("---")
     
     # Recommendation
