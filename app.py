@@ -741,7 +741,7 @@ elif mode == "Model Analytics":
         st.markdown("---")
         
         # Feature importance (if available in model_data)
-      st.markdown("---")
+        st.markdown("---")
         
         # Correlation heatmap
         st.markdown("<div class='section-header'><h4>Feature Correlation Analysis</h4></div>", unsafe_allow_html=True)
