@@ -422,60 +422,6 @@ if mode == "Price Predictor":
             </div>
         """, unsafe_allow_html=True)
         
-        # Price distribution context
-        if raw_data is not None:
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                st.markdown("<div class='section-header'><h4>Price Distribution</h4></div>", unsafe_allow_html=True)
-                
-                fig = go.Figure()
-                fig.add_trace(go.Histogram(
-                    x=raw_data['Price_Tsh'],
-                    nbinsx=30,
-                    name='All Laptops',
-                    marker_color='#a5c9e6'
-                ))
-                fig.add_vline(x=prediction, line_dash="dash", line_color="#3498db", 
-                             annotation_text="Predicted", annotation_position="top")
-                fig.update_layout(
-                    height=300,
-                    margin=dict(l=20, r=20, t=20, b=20),
-                    showlegend=False,
-                    xaxis_title="Price (Tsh)",
-                    yaxis_title="Count",
-                    plot_bgcolor='white',
-                    paper_bgcolor='white'
-                )
-                st.plotly_chart(fig, use_container_width=True)
-            
-            with col2:
-                st.markdown("<div class='section-header'><h4>Price Percentile</h4></div>", unsafe_allow_html=True)
-                
-                percentile = (raw_data['Price_Tsh'] < prediction).mean() * 100
-                
-                fig = go.Figure(go.Indicator(
-                    mode="gauge+number",
-                    value=percentile,
-                    title={'text': "Price Percentile"},
-                    gauge={
-                        'axis': {'range': [0, 100]},
-                        'bar': {'color': "#3498db"},
-                        'steps': [
-                            {'range': [0, 33], 'color': "#ebf5fb"},
-                            {'range': [33, 67], 'color': "#d6eaf8"},
-                            {'range': [67, 100], 'color': "#a9cce3"}
-                        ],
-                        'threshold': {
-                            'line': {'color': "#e74c3c", 'width': 4},
-                            'thickness': 0.75,
-                            'value': 90
-                        }
-                    }
-                ))
-                fig.update_layout(height=300, margin=dict(l=20, r=20, t=20, b=20))
-                st.plotly_chart(fig, use_container_width=True)
-        
         # Recommendations
         if raw_data is not None:
             brand_laptops = raw_data[raw_data['Company'] == saved_inputs['company']].copy()
