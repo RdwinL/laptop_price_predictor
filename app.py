@@ -367,7 +367,7 @@ if mode == "Price Predictor":
         <style>
       /* Primary button - centered text with larger font */
         button[kind="primary"] p {
-            font-size: 18px !important;
+            font-size: 25px !important;
             font-weight: 600 !important;
         }
         
