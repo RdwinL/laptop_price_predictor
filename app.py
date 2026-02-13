@@ -142,6 +142,8 @@ st.markdown("""
     /* Radio buttons accent */
     .stRadio > label {
         color: #1A2A4F;
+        font-size: 4rem;
+        font-weight: 600;
     }
     
     /* Selectbox accent */
