@@ -128,7 +128,7 @@ st.markdown("""
     .stat-value {
         font-size: 2rem;
         font-weight: 600;
-        color: #2980b9;
+        color: #000080;
         margin: 0;
     }
     
