@@ -365,13 +365,16 @@ if mode == "Price Predictor":
     # Button styling - place before buttons
     st.markdown("""
         <style>
-        /* Primary button - centered text */
+      /* Primary button - centered text with larger font */
+        button[kind="primary"] p {
+            font-size: 18px !important;
+            font-weight: 600 !important;
+        }
+        
         button[kind="primary"] {
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            font-size: 18px !important;
-            font-weight: 600 !important;
         }
         
         /* Reset button styling */
