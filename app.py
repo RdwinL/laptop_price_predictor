@@ -382,13 +382,15 @@ if mode == "Price Predictor":
             background: white !important;
             color: #e74c3c !important;
             border: 2px solid #e74c3c !important;
-            font-size: 20px !important;
-            font-weight: 600 !important;
         }
         button[kind="secondary"]:hover {
             background: #DC0E0E !important;
             color: white !important;
             box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4) !important;
+        }
+         button[kind="secondary"] p {
+            font-size: 20px !important;
+            font-weight: 600 !important;
         }
         </style>
     """, unsafe_allow_html=True)
