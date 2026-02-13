@@ -134,7 +134,7 @@ st.markdown("""
     
     .stat-label {
         font-size: 0.9rem;
-        color: #6c757d;
+        color: #000000;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
