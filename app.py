@@ -370,7 +370,7 @@ if mode == "Price Predictor":
     with col2:
     # CSS (place once before buttons)
 st.markdown("""
-<style>
+    <style>
 
         /* Reset button default white */
         div[data-testid="stButton"] button[key="reset_btn"] {
@@ -388,7 +388,7 @@ st.markdown("""
             box-shadow: 0 4px 10px rgba(231, 76, 60, 0.4);
         }
         
-        </style>
+    </style>
         """, unsafe_allow_html=True)
         
         # Buttons aligned
