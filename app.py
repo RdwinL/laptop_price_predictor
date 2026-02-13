@@ -236,6 +236,25 @@ with st.sidebar:
     
     st.markdown("---")
     
+    # Model download button
+    st.subheader("Download Model")
+    try:
+        with open('model.pkl', 'rb') as f:
+            model_bytes = f.read()
+        
+        st.download_button(
+            label="Download Model (.pkl)",
+            data=model_bytes,
+            file_name="laptop_price_model.pkl",
+            mime="application/octet-stream",
+            help="Download the trained machine learning model",
+            use_container_width=True
+        )
+    except FileNotFoundError:
+        st.error("Model file not found")
+    
+    st.markdown("---")
+    
     # About section
     with st.expander("About This Tool"):
         st.markdown("""
