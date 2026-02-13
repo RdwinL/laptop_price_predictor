@@ -383,25 +383,18 @@ if mode == "Price Predictor":
                 color: white !important;
                 box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4) !important;
             }
-            /* Center align predict button text */
+        /* Center align predict button text */
             button[kind="primary"] {
-                padding: 0.65rem 1rem !important;
-                height: auto !important;
-                min-height: auto !important;
+                line-height: 1 !important;
+                padding: 0.75rem 1rem !important;
             }
             
-            button[kind="primary"] div {
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-            }
-            
-            button[kind="primary"] p {
+            button[kind="primary"] * {
+                vertical-align: middle !important;
                 margin: 0 !important;
                 padding: 0 !important;
-                line-height: normal !important;
-            }
-                        
+                line-height: 1 !important;
+            }       
             </style>
         """, unsafe_allow_html=True)
         if st.button("🔄 Reset", use_container_width=True, type="secondary", key="reset_btn"):
