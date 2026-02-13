@@ -7,7 +7,7 @@ import plotly.express as px
 
 # Page configuration
 st.set_page_config(
-    page_title="Laptop Price Intelligence",
+    page_title="Laptop Price Predictor",
     page_icon="💻",
     layout="wide",
     initial_sidebar_state="expanded"
