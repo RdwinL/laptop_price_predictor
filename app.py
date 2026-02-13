@@ -370,6 +370,8 @@ if mode == "Price Predictor":
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
+            font-size: 18px !important;
+            font-weight: 600 !important;
         }
         
         /* Reset button styling */
