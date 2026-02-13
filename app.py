@@ -385,6 +385,9 @@ if mode == "Price Predictor":
             }
             /* Ensure primary button has same height */
             button[kind="primary"] {
+                 display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
                 min-height: 2.5rem !important;
                 height: 2.5rem !important;
             }
