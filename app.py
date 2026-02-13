@@ -363,9 +363,9 @@ if mode == "Price Predictor":
     st.markdown("---")
     
     # Main Action Button - Predict Price
-    col1, col2 = st.columns([6, 1])
+    col1, col2 = st.columns([6, 2])
     with col1:
-        predict_button = st.button("🔮 Predict Price", use_container_width=True, type="primary", key="main_predict")
+        predict_button = st.button("Predict Price", use_container_width=True, type="primary", key="main_predict")
     with col2:
         st.markdown("""
             <style>
