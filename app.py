@@ -149,20 +149,16 @@ st.markdown("""
         font-size: 14px !important;
     }
     
-    /* Sidebar radio buttons - larger font */
+    /* Sidebar radio buttons - match sidebar font sizes */
     [data-testid="stSidebar"] .stRadio > label {
         color: #1A2A4F !important;
-        font-size: 18px !important;
+        font-size: 16px !important;
         font-weight: 600 !important;
     }
     
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {
-        font-size: 16px !important;
-        font-weight: 500 !important;
-    }
-    /* Selectbox accent */
-    div[data-baseweb="select"] > div {
-        border-color: #d6eaf8;
+        font-size: 14px !important;
+        font-weight: 400 !important;
     }
     
     div[data-baseweb="select"] > div:hover {
