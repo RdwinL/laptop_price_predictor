@@ -615,6 +615,35 @@ if mode == "Price Predictor":
             use_container_width=True,
             type="secondary"
         )
+     # Recommendations
+        if raw_data is not None:
+            brand_laptops = raw_data[raw_data['Company'] == saved_inputs['company']].copy()
+            if len(brand_laptops) > 0:
+                brand_laptops['price_diff'] = abs(brand_laptops['Price_Tsh'] - prediction)
+                recommendations = brand_laptops.nsmallest(3, 'price_diff')
+                
+                st.markdown(f"<div class='section-header'><h4>Similar Products from {saved_inputs['company']}</h4></div>", unsafe_allow_html=True)
+                
+                for i, (_, row) in enumerate(recommendations.iterrows(), 1):
+                    st.markdown(f"""
+                        <div class="product-card">
+                            <h4 style="margin-top: 0; color: #2980b9;">{row['Company']} {row['Product']}</h4>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 0.75rem;">
+                                <div>
+                                    <p style="margin: 0.25rem 0;"><strong>Price:</strong> {row['Price_Tsh']:,.0f} Tsh</p>
+                                    <p style="margin: 0.25rem 0;"><strong>Type:</strong> {row['TypeName']}</p>
+                                </div>
+                                <div>
+                                    <p style="margin: 0.25rem 0;"><strong>RAM:</strong> {row['Ram']} GB</p>
+                                    <p style="margin: 0.25rem 0;"><strong>Storage:</strong> {row['PrimaryStorage']} GB</p>
+                                </div>
+                                <div>
+                                    <p style="margin: 0.25rem 0;"><strong>Screen:</strong> {row['Inches']}"</p>
+                                    <p style="margin: 0.25rem 0;"><strong>Difference:</strong> {abs(row['Price_Tsh'] - prediction):,.0f} Tsh</p>
+                                </div>
+                            </div>
+                        </div>
+                    """, unsafe_allow_html=True)
 # ============================================================================
 # MODE 2: BUDGET FINDER
 # ============================================================================
