@@ -290,16 +290,6 @@ def load_model():
 
 ---
 
-## 🔒 Security Best Practices
-
-1. **Don't commit sensitive data**
-2. **Use environment variables**
-3. **Validate all inputs**
-4. **Add rate limiting** (for Flask)
-5. **Use HTTPS** (provided by hosting platforms)
-
----
-
 ## 📱 Sharing Your App
 
 ### URL Structure:
@@ -390,23 +380,6 @@ git push origin main
 
 ---
 
-## ✅ Deployment Checklist
 
-Before going live:
 
-- [ ] Test all features locally
-- [ ] Update README with live URL
-- [ ] Add screenshots to README
-- [ ] Test on mobile devices
-- [ ] Check loading speed
-- [ ] Verify predictions accuracy
-- [ ] Add contact/feedback option
-- [ ] Set up error tracking
-- [ ] Share with test users
-- [ ] Get feedback and iterate
 
----
-
-**Congratulations!** 🎉
-
-Your Laptop Price Prediction app is now deployed and accessible worldwide!
