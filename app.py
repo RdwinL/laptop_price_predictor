@@ -145,7 +145,7 @@ st.markdown("""
     }
     
     .stRadio div[role="radiogroup"] label {
-        font-size: 14px;
+        font-size: 18px;
     }
     
     /* Sidebar radio buttons - larger font */
