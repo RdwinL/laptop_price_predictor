@@ -151,6 +151,8 @@ st.markdown("""
     /* Sidebar radio buttons - larger font */
     [data-testid="stSidebar"] .stRadio > label {
         color: #5DD3B6;
+        font-size: 18px !important;
+        font-weight: 600 !important;
     }
     
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {
