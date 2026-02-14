@@ -142,11 +142,11 @@ st.markdown("""
 /* Radio buttons accent */
     .stRadio > label {
         color: #2c3e50 !important;
-        font-size: 18px !important;
+        font-size: 14px !important;
     }
     
     .stRadio div[role="radiogroup"] label {
-        font-size: 18px !important;
+        font-size: 14px !important;
     }
     
     /* Sidebar radio buttons - larger font */
