@@ -150,7 +150,7 @@ st.markdown("""
     
     /* Sidebar radio buttons - match sidebar font sizes */
     [data-testid="stSidebar"] .stRadio > label p {
-        font-size: 16px !important;
+        font-size: 18px !important;
         font-weight: 600 !important;
         color: #1A2A4F !important;
     }
