@@ -355,7 +355,7 @@ if mode == "Price Predictor":
     with col2:
         weight = st.selectbox("Weight (kg)", [0.5, 5.0, 2.0, 0.1], key='weight_input')
     with col3:
-        inches = st.selectbox("Screen Size (inches)", [10.0, 12.0, 13.0, 14.0, 18.0, 15.6, 0.1,] key='inches_input')
+        inches = st.selectbox("Screen Size (inches)", [10.0, 12.0, 13.0, 14.0, 18.0, 15.6, 0.1], key='inches_input')
     with col4:
         os = st.selectbox("Operating System", available_os, key='os_select')
     
