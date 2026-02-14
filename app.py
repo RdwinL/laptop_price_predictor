@@ -150,11 +150,11 @@ st.markdown("""
     
     /* Sidebar radio buttons - larger font */
     [data-testid="stSidebar"] .stRadio > label {
-        color: #1A2A4F;
+        color: #5DD3B6;
     }
     
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {
-        font-size: 18px !important;
+        font-size: 16px !important;
     }
     
     /* Selectbox accent */
