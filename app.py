@@ -139,26 +139,27 @@ st.markdown("""
         letter-spacing: 0.5px;
     }
     
-   /* Radio buttons accent */
+/* Radio buttons accent */
     .stRadio > label {
-        color: #2c3e50;
+        color: #2c3e50 !important;
+        font-size: 14px !important;
     }
     
     .stRadio div[role="radiogroup"] label {
-        font-size: 14px;
+        font-size: 14px !important;
     }
     
     /* Sidebar radio buttons - larger font */
     [data-testid="stSidebar"] .stRadio > label {
-        color: #5DD3B6;
+        color: #1A2A4F !important;
         font-size: 18px !important;
         font-weight: 600 !important;
     }
     
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {
         font-size: 16px !important;
+        font-weight: 500 !important;
     }
-    
     /* Selectbox accent */
     div[data-baseweb="select"] > div {
         border-color: #d6eaf8;
