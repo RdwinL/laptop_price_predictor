@@ -351,7 +351,7 @@ if mode == "Price Predictor":
     
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        cpu_freq = st.selectbox("CPU Frequency (GHz)", 1.0, 4.0, 2.5, 0.1, key='cpu_freq_input')
+        cpu_freq = st.selectbox("CPU Frequency (GHz)", [1.5, 2.0, 2.5, 3.0, 3.5, 4.0], index=2, key='cpu_freq_input')
     with col2:
         weight = st.number_input("Weight (kg)", 0.5, 5.0, 2.0, 0.1, key='weight_input')
     with col3:
