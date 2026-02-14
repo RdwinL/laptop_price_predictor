@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laptop Price Predictor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">💻 Laptop Price Predictor</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/">Predictor</a>
+                <a class="nav-link" href="#budget">Budget Finder</a>
+                <a class="nav-link" href="/analytics">Analytics</a>
+                <a class="nav-link" href="/comparison">Comparison</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Model Performance Summary -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <p class="stat-label">R² Score</p>
+                    <p class="stat-value">{{ "%.3f"|format(r2_score) }}</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <p class="stat-label">RMSE</p>
+                    <p class="stat-value">{{ "%.0f"|format(rmse/1000) }}K</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <p class="stat-label">Features</p>
+                    <p class="stat-value">{{ features }}</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <p class="stat-label">Model</p>
+                    <p class="stat-value" style="font-size: 1.2rem;">{{ model_name }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prediction Form -->
+        <div class="section-header">
+            <h3>Configure Laptop Specifications</h3>
+        </div>
+
+        <form id="predictionForm">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Manufacturer</label>
+                    <select class="form-select" id="company" name="company" required>
+                        {% for comp in companies %}
+                        <option value="{{ comp }}">{{ comp }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Type</label>
+                    <select class="form-select" id="type" name="type" required>
+                        <option value="Notebook">Notebook</option>
+                    </select>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label class="form-label">RAM (GB)</label>
+                    <select class="form-select" name="ram" required>
+                        <option value="2">2 GB</option>
+                        <option value="4">4 GB</option>
+                        <option value="6">6 GB</option>
+                        <option value="8" selected>8 GB</option>
+                        <option value="12">12 GB</option>
+                        <option value="16">16 GB</option>
+                        <option value="24">24 GB</option>
+                        <option value="32">32 GB</option>
+                        <option value="64">64 GB</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Storage (GB)</label>
+                    <select class="form-select" name="storage" required>
+                        <option value="32">32 GB</option>
+                        <option value="64">64 GB</option>
+                        <option value="128">128 GB</option>
+                        <option value="256" selected>256 GB</option>
+                        <option value="512">512 GB</option>
+                        <option value="1024">1024 GB</option>
+                        <option value="2048">2048 GB</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">CPU Brand</label>
+                    <select class="form-select" id="cpu_company" name="cpu_company" required>
+                        <option value="Intel">Intel</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">GPU Brand</label>
+                    <select class="form-select" id="gpu_company" name="gpu_company" required>
+                        <option value="Intel">Intel</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label class="form-label">CPU Frequency (GHz)</label>
+                    <select class="form-select" name="cpu_freq" required>
+                        <option value="1.5">1.5 GHz</option>
+                        <option value="2.0">2.0 GHz</option>
+                        <option value="2.5" selected>2.5 GHz</option>
+                        <option value="3.0">3.0 GHz</option>
+                        <option value="3.5">3.5 GHz</option>
+                        <option value="4.0">4.0 GHz</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Weight (kg)</label>
+                    <input type="number" class="form-control" name="weight" value="2.0" step="0.1" min="0.5" max="5.0" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Screen Size (inches)</label>
+                    <input type="number" class="form-control" name="inches" value="15.6" step="0.1" min="10.0" max="18.0" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Operating System</label>
+                    <select class="form-select" id="os" name="os" required>
+                        <option value="Windows 10">Windows 10</option>
+                    </select>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">Touchscreen</label>
+                    <div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="touchscreen" value="No" checked>
+                            <label class="form-check-label">No</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="touchscreen" value="Yes">
+                            <label class="form-check-label">Yes</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">IPS Panel</label>
+                    <div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="ips_panel" value="No" checked>
+                            <label class="form-check-label">No</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="ips_panel" value="Yes">
+                            <label class="form-check-label">Yes</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Retina Display</label>
+                    <div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="retina_display" value="No" checked>
+                            <label class="form-check-label">No</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="retina_display" value="Yes">
+                            <label class="form-check-label">Yes</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="row">
+                <div class="col-md-10">
+                    <button type="submit" class="btn btn-primary btn-lg w-100">Predict Price</button>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-danger btn-lg w-100" onclick="resetForm()">Reset</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Prediction Result -->
+        <div id="predictionResult" class="mt-4" style="display: none;">
+            <div class="prediction-card">
+                <h2>Predicted Price</h2>
+                <h1 id="predictedPrice"></h1>
+                <p id="predictedPriceUSD"></p>
+            </div>
+
+            <button class="btn btn-secondary btn-lg w-100 mb-4" onclick="downloadReport()">📥 Download Prediction Report (PDF)</button>
+
+            <div id="recommendations"></div>
+        </div>
+
+        <!-- Budget Finder Section -->
+        <div id="budget" class="mt-5">
+            <div class="section-header">
+                <h3>Find Laptops by Budget</h3>
+            </div>
+
+            <form id="budgetForm">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Minimum Budget (Tsh)</label>
+                        <input type="number" class="form-control" name="min_price" value="1000000" step="100000" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Maximum Budget (Tsh)</label>
+                        <input type="number" class="form-control" name="max_price" value="3000000" step="100000" required>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Minimum RAM (GB)</label>
+                        <select class="form-select" name="min_ram">
+                            <option value="0">Any</option>
+                            <option value="4">4 GB</option>
+                            <option value="8">8 GB</option>
+                            <option value="16">16 GB</option>
+                            <option value="32">32 GB</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg w-100">Search Laptops</button>
+            </form>
+
+            <div id="budgetResults" class="mt-4" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

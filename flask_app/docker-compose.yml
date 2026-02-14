@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: laptop-price-predictor
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./model.pkl:/app/model.pkl
+      - ./laptop_prices.csv:/app/laptop_prices.csv
+    environment:
+      - FLASK_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
