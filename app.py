@@ -615,7 +615,7 @@ if mode == "Price Predictor":
             use_container_width=True,
             type="secondary"
         )
-   # Recommendations
+# Recommendations
         if raw_data is not None:
             brand_laptops = raw_data[raw_data['Company'] == saved_inputs['company']].copy()
             if len(brand_laptops) > 0:
@@ -625,22 +625,57 @@ if mode == "Price Predictor":
                 st.markdown(f"<div class='section-header'><h4>Similar Products from {saved_inputs['company']}</h4></div>", unsafe_allow_html=True)
                 
                 for i, (_, row) in enumerate(recommendations.iterrows(), 1):
+                    # Determine price difference indicator
+                    diff = row['Price_Tsh'] - prediction
+                    if diff > 0:
+                        diff_color = "#e74c3c"
+                        diff_symbol = "+"
+                    elif diff < 0:
+                        diff_color = "#27ae60"
+                        diff_symbol = ""
+                    else:
+                        diff_color = "#95a5a6"
+                        diff_symbol = ""
+                    
                     st.markdown(f"""
                         <div class="product-card">
-                            <h4 style="margin-top: 0; color: #2980b9;">{row['Company']} {row['Product']}</h4>
-                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 0.75rem;">
-                                <div>
-                                    <p style="margin: 0.25rem 0;"><strong>Price:</strong> {row['Price_Tsh']:,.0f} Tsh</p>
-                                    <p style="margin: 0.25rem 0;"><strong>Type:</strong> {row['TypeName']}</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <h4 style="margin: 0; color: #2980b9;">{i}. {row['Company']} {row['Product']}</h4>
+                                <span style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); 
+                                             color: white; padding: 0.5rem 1rem; border-radius: 20px; 
+                                             font-weight: 600; font-size: 0.95rem;">
+                                    {row['Price_Tsh']:,.0f} Tsh
+                                </span>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; 
+                                        margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #ebf5fb;">
+                                <div style="text-align: center; padding: 0.5rem; background: #f8f9fa; border-radius: 6px;">
+                                    <p style="margin: 0; font-size: 0.8rem; color: #6c757d; text-transform: uppercase;">Type</p>
+                                    <p style="margin: 0.25rem 0 0 0; font-weight: 600; color: #2c3e50;">{row['TypeName']}</p>
                                 </div>
-                                <div>
-                                    <p style="margin: 0.25rem 0;"><strong>RAM:</strong> {row['Ram']} GB</p>
-                                    <p style="margin: 0.25rem 0;"><strong>Storage:</strong> {row['PrimaryStorage']} GB</p>
+                                <div style="text-align: center; padding: 0.5rem; background: #f8f9fa; border-radius: 6px;">
+                                    <p style="margin: 0; font-size: 0.8rem; color: #6c757d; text-transform: uppercase;">RAM</p>
+                                    <p style="margin: 0.25rem 0 0 0; font-weight: 600; color: #2c3e50;">{row['Ram']} GB</p>
                                 </div>
-                                <div>
-                                    <p style="margin: 0.25rem 0;"><strong>Screen:</strong> {row['Inches']}"</p>
-                                    <p style="margin: 0.25rem 0;"><strong>Difference:</strong> {abs(row['Price_Tsh'] - prediction):,.0f} Tsh</p>
+                                <div style="text-align: center; padding: 0.5rem; background: #f8f9fa; border-radius: 6px;">
+                                    <p style="margin: 0; font-size: 0.8rem; color: #6c757d; text-transform: uppercase;">Storage</p>
+                                    <p style="margin: 0.25rem 0 0 0; font-weight: 600; color: #2c3e50;">{row['PrimaryStorage']} GB</p>
                                 </div>
+                                <div style="text-align: center; padding: 0.5rem; background: #f8f9fa; border-radius: 6px;">
+                                    <p style="margin: 0; font-size: 0.8rem; color: #6c757d; text-transform: uppercase;">Screen</p>
+                                    <p style="margin: 0.25rem 0 0 0; font-weight: 600; color: #2c3e50;">{row['Inches']}"</p>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 1rem; padding: 0.75rem; background: #ebf5fb; 
+                                        border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: #2c3e50; font-size: 0.9rem;">
+                                    <strong>Price vs Prediction:</strong>
+                                </span>
+                                <span style="color: {diff_color}; font-weight: 600; font-size: 1rem;">
+                                    {diff_symbol}{abs(diff):,.0f} Tsh ({diff_symbol}{abs(diff/prediction*100):.1f}%)
+                                </span>
                             </div>
                         </div>
                     """, unsafe_allow_html=True)
