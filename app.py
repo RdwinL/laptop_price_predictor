@@ -142,7 +142,6 @@ st.markdown("""
 /* Radio buttons accent */
     .stRadio > label {
         color: #2c3e50 !important;
-        font-size: 14px !important;
     }
     
     .stRadio div[role="radiogroup"] label {
@@ -150,13 +149,13 @@ st.markdown("""
     }
     
     /* Sidebar radio buttons - match sidebar font sizes */
-    [data-testid="stSidebar"] .stRadio > label {
-        color: #1A2A4F !important;
+    [data-testid="stSidebar"] .stRadio > label p {
         font-size: 16px !important;
         font-weight: 600 !important;
+        color: #1A2A4F !important;
     }
     
-    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {
+    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label p {
         font-size: 14px !important;
         font-weight: 400 !important;
     }
