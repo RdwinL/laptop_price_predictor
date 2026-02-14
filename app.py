@@ -608,7 +608,7 @@ if mode == "Price Predictor":
         pdf_data = create_pdf_report()
         
         st.download_button(
-            label="📥 Download Prediction Report (PDF)",
+            label="➜] Download Prediction Report (PDF)",
             data=pdf_data,
             file_name=f"laptop_price_prediction_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.pdf",
             mime="application/pdf",
