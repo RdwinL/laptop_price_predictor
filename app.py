@@ -353,9 +353,9 @@ if mode == "Price Predictor":
     with col1:
         cpu_freq = st.selectbox("CPU Frequency (GHz)", [1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5], index=2, key='cpu_freq_input')
     with col2:
-        weight = st.selectbox("Weight (kg)", [0.5, 5.0, 2.0, 0.1], key='weight_input')
+        weight = st.selectbox("Weight (kg)", [1.0, 1.3, 1.8, 2.0, 2.5, 3.0, 4.0], key='weight_input')
     with col3:
-        inches = st.selectbox("Screen Size (inches)", [10.0, 12.0, 13.0, 14.0, 18.0, 15.6, 0.1], key='inches_input')
+        inches = st.selectbox("Screen Size (inches)", [11.0, 12.0, 13.0, 14.0, 15.0, 15.6, 16.0, 18.0], key='inches_input')
     with col4:
         os = st.selectbox("Operating System", available_os, key='os_select')
     
