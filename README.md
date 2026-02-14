@@ -11,6 +11,7 @@ This project implements a machine learning model to predict laptop prices based 
 - **Model Evaluation**: Detailed performance comparison using multiple metrics
 - **Interactive Web App**: User-friendly interface for price predictions
 - **Visualizations**: Multiple plots for data analysis and model performance
+- **Budget analysis**: Suggest Laptops based on budget
 
 ## 📊 Model Performance
 
