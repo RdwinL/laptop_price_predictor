@@ -145,7 +145,7 @@ st.markdown("""
     }
     
     .stRadio div[role="radiogroup"] label {
-        font-size: 18px;
+        font-size: 14px;
     }
     
     /* Sidebar radio buttons - larger font */
@@ -154,7 +154,7 @@ st.markdown("""
     }
     
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {
-        font-size: 16px !important;
+        font-size: 18px !important;
     }
     
     /* Selectbox accent */
