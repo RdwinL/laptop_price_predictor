@@ -615,7 +615,7 @@ if mode == "Price Predictor":
             use_container_width=True,
             type="secondary"
         )
-     # Recommendations
+   # Recommendations
         if raw_data is not None:
             brand_laptops = raw_data[raw_data['Company'] == saved_inputs['company']].copy()
             if len(brand_laptops) > 0:
